@@ -1,26 +1,79 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch
+} from 'react-router-dom';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+//import TestComponent from './components/TestComponent';
+import Header from './components/Header';
+import Courses from './components/Courses';
+import CourseDetails from './components/CourseDetail';
+import UserSignUp from './components/UserSignUp';
+import UserSignIn from './components/UserSignIn';
+
+
+
+class App extends React.Component {
+
+  constructor(props){
+    super(props);
+    this.state = {
+      courseSite: 2
+    }
+  }
+
+  
+  setCourseSite = (id) => {
+    this.setState({
+      courseSite: id
+    });
+  }
+
+
+  render(){
+
+    return(
+      <Router>
+        <div className="root">
+          <div>
+            <Header />
+          </div>
+          <Switch>
+            <Route exact path="/signup" render={ (props) => 
+              <UserSignUp
+                
+                {...props}
+              /> } 
+            />
+            <Route exact path="/signin" render={ (props) => 
+              <UserSignIn
+
+                {...props}
+              /> } 
+            />
+            <Route exact path="/index" render={ (props) => 
+              <Courses
+                setCourseSite={this.setCourseSite}
+                {...props}
+              /> } 
+            />
+            <Route path="/index/:val" render={ (props) => 
+              <CourseDetails 
+                courseId={this.state.courseSite}
+                {...props}
+              /> } 
+            />
+          </Switch>
+        </div>
+      </Router>
+    );
+  }
 }
 
 export default App;
+
+
+

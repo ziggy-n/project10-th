@@ -3,6 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const cors = require('cors');
+//const models = require('./models'); // remove when remove test
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -19,15 +22,35 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+// app.get('/test', async (req, res, next) => {
+//   try{
+//     let listusers = null;
+//     await models.User.findAll({ 
+//         attributes: ['id', 'firstName', 'lastName', 'emailAddress']
+//     }).then(function(list){
+//         listusers = list;
+//     });
+//     res.json(listusers);
+//   } catch(err){
+//     next(err);
+//   }
+// });
+
+
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api', apiRouter);
+
+
 
 
 app.use((req, res, next) => {

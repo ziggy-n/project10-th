@@ -39,6 +39,10 @@ const emailFormatValidation = check('emailAddress')
     .withMessage('not a valid email');
 
 
+
+
+
+
 // middleware to check if provided email isn't already in database
 const uniqueEmailCheck = async (req, res, next) =>{
     try{
@@ -141,6 +145,8 @@ const permission = async (req, res, next) => {
     
     
 }
+
+
 
 
 // returns currently authenticated user
@@ -261,15 +267,7 @@ router.get('/courses/:id', async (req, res, next) => {
     try{
         const idNr = req.params.id;
         await models.Course.findOne({
-            where: {id: idNr},
-            attributes: [
-                "id",
-                "userId",
-                "title",
-                "description",
-                "estimatedTime",
-                "materialsNeeded"
-            ]
+            where: {id: idNr}
         }).then(function(course){
             if(course){
                 res.json(course);
