@@ -186,10 +186,15 @@ router.post('/users', [firstNameValidation, lastNameValidation, emailAddressVali
         } else {
             if(req.body){
                 const user = req.body;
+                const newUser = null;
                 user.password = bcryptjs.hashSync(user.password);
-                await models.User.create(user);
-                res.location('/');
-                res.status(201).end();
+                await models.User.create(user).then(
+                    result => newUser = result
+                );
+                res.location('/'); // remove? 
+
+                // changed here, originally res.status(201).end()
+                res.status(201).json(newUser);
             } else {
                 res.locals.errStatus = 400;
                 res.locals.errMsg = "user data required";
@@ -237,19 +242,24 @@ router.get('/courses', async (req, res, next) => {
 router.post('/courses', [authenticate, titleValidation, descriptionValidation], 
     async (req, res, next) => {
     try{
-
+        console.log("in post course route");
         const errors = validationResult(req);
 
         if(!errors.isEmpty){
+            console.log("validation error occurred");
             const errMsgs = errors.array().map(err => err.msg);
             res.locals.errStatus = 400;
             res.locals.errMsg = errMsgs;
             next(new Error());
         } else {
+            console.log("no validation error occurred");
             const courseData = req.body; 
             let id = null;
+            console.log("before creation");
+            console.dir(courseData);
             await models.Course.create(courseData).then(function(course){
                 id = course.id;
+                console.log("after creation");
             });
             res.location('/api/courses/' + id);
             res.status(201).end();
@@ -304,6 +314,7 @@ router.get('/courses/:id', async (req, res, next) => {
 router.put('/courses/:id', [authenticate, permission], async (req, res, next) => {
     
     try {
+        
         const id = req.params.id;
         const update = req.body;
         if(update){

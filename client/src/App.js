@@ -8,13 +8,15 @@ import {
 
 import { Provider } from './components/Context';
 
-//import TestComponent from './components/TestComponent';
 import Header from './components/Header';
 import Courses from './components/Courses';
-import CourseDetails from './components/CourseDetail';
+import CourseDetails from './components/CourseDetails';
 import UserSignUp from './components/UserSignUp';
 import UserSignIn from './components/UserSignIn';
 import CreateCourse from './components/CreateCourse';
+import UpdateCourse from './components/UpdateCourse';
+import UserSignOut from './components/UserSignOut';
+import NotFound from './components/NotFound';
 
 //import { withContext } from './components/Context';
 //const HeaderWithContext = withContext(Header);
@@ -25,18 +27,10 @@ class App extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      courseSite: 2
     }
   }
 
-  
-  setCourseSite = (id) => {
-    this.setState({
-      courseSite: id
-    });
-  }
 
-  
 
 
   render(){
@@ -52,29 +46,43 @@ class App extends React.Component {
           </div>
           <Switch>
             <Provider>
+
               <Route exact path="/signup" component={UserSignUp} /> 
               
               <Route exact path="/signin" render={ (props) => 
                 <UserSignIn
-
+                  {...props}
+                /> } 
+              />
+              <Route exact path="/signout" render={ (props) => 
+                <UserSignOut
                   {...props}
                 /> } 
               />
 
-              <Route exact path="/index" render={ (props) => 
+              <Route exact path="/" render={ (props) => 
                 <Courses
-                  setCourseSite={this.setCourseSite}
-                  {...props}
-                /> } 
-              />
-              <Route path="/index/:val" render={ (props) => 
-                <CourseDetails 
-                  courseId={this.state.courseSite}
                   {...props}
                 /> } 
               />
 
-              <Route path="/create-course" component={CreateCourse} /> 
+              <Route exact path="/courses/create" component={CreateCourse} /> 
+
+
+              <Route path="courses/:val/update" render={ (props) => 
+                <UpdateCourse 
+                  {...props}
+                /> } 
+              />
+
+              <Route path="courses/:val" render={ (props) => 
+                <CourseDetails 
+                  {...props}
+                /> } 
+              />
+
+              <Route component={NotFound} />
+              
 
             </Provider>
             
@@ -90,3 +98,7 @@ export default App;
 
 
 
+/*** 
+ * 
+ * 
+***/

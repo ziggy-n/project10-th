@@ -1,6 +1,8 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-
+import { MyContext }  from './Context';
+import Delete from  './Delete';
+import CourseDetailsBar from './CourseDetailsBar';
 
 class CourseDetails extends Component {
 
@@ -8,14 +10,18 @@ class CourseDetails extends Component {
         super(props);
         this.state = {
           courseDetails: {},
-          ownerDetails: {}
+          ownerDetails: {},
+          askDelete: false
         }
     }
     
     async componentDidMount(){
+
+        let id = this.props.match.params.val;
         let course = null;
         let owner = null;
-        await fetch(`http://localhost:5000/api/courses/${this.props.courseId}`
+        
+        await fetch(`http://localhost:5000/api/courses/${id}`
             ).then(function(response){
                 return response.json();
             }).then(function(data){
@@ -35,10 +41,55 @@ class CourseDetails extends Component {
     }
 
 
+    declineDelete = () => {
+        this.setState({
+            askDelete: false
+        })
+    }
+
+    requestDelete = () => {
+        this.setState({
+            askDelete: true
+        })
+    }
+
+    acceptDelete = async () => {
+
+        // set options
+        const options = {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json; charset=utf-8',},
+            body: null
+        }
+
+        // dealing with credentials
+        const encodedCredentials = btoa(`${this.context.currentAuthUserEmail}:${this.context.currentAuthUserPassword}`);
+        options.headers['Authorization'] = `Basic ${encodedCredentials}`;
+
+
+        // check if email matches password
+        const response = await fetch(`http://localhost:5000/api/courses/${this.state.courseDetails.id}`, options);
+ 
+        if(response.status === 204){
+            // is it necessary if you redirect after this anyways? 
+            this.setState({
+                askDelete: false
+            });
+            console.log("deleted course successfully");
+            this.props.history.push('/');
+        } else {
+            console.log("error occurred when deleting course");
+        }
+        
+    }
 
     render(){
+        console.log("inside course detail render")
         let objOwner = this.state.ownerDetails;
         let objCourse = this.state.courseDetails;
+
+        //console.log("check course number");
+        //console.log(this.props.match.params.val)
 
         // console.log("console logging course obj");
         // console.log(obj);
@@ -79,13 +130,17 @@ class CourseDetails extends Component {
             <div>
                 <div className="actions--bar">
                     <div className="bounds">
-                        <div className="grid-100">
-                            <span>
-                                <Link className="button" to="">Update Course</Link>
-                                <Link className="button" to="">Delete Course</Link>
-                            </span>
-                            <Link className="button button--secondary" to="">Return to List</Link>
-                        </div>
+                        <CourseDetailsBar 
+                            askDelete={this.state.askDelete}
+                            requestDelete={this.requestDelete}
+                            courseId={this.props.match.params.val}
+                        />
+                        <Delete 
+                            askDelete={this.state.askDelete} 
+                            title={objCourse.title}
+                            declineDelete={this.declineDelete}
+                            acceptDelete={this.acceptDelete}
+                        />
                     </div>
                 </div>
                 <div className="bounds course--details">
@@ -116,10 +171,13 @@ class CourseDetails extends Component {
                         </div>
                     </div>
                 </div>
+                
             </div>
         );
     }
 }
+
+CourseDetails.contextType = MyContext;
 
 export default  CourseDetails;
 

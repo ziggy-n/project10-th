@@ -12,18 +12,47 @@ class CreateCourse extends Component {
 
     handleCancel = (event) => {
         event.preventDefault();
-
+        this.props.history.push('/');
     }
 
-    handleSubmit = (event) => {
+    handleSubmit = async (event) => {
         event.preventDefault();
+        
+        const data = {
+            title: this.titleInput.current.value,
+            description: this.descriptionInput.current.value,
+            estimatedTime: this.estimatedTimeInput.current.value,
+            materialsNeeded: this.materialsNeededInput.current.value,
+            userId: this.context.currentAuthUserId
+        }
+
+        // set options
+        const options = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json',},
+            body: JSON.stringify(data)
+        }
+
+        // dealing with credentials
+        const encodedCredentials = btoa(`${this.context.currentAuthUserEmail}:${this.context.currentAuthUserPassword}`);
+        options.headers['Authorization'] = `Basic ${encodedCredentials}`;
+
+
+        // 
+        const response = await fetch('http://localhost:5000/api/courses', options);
+
+        if(response.status === 201){
+            console.log("new course successfully created");
+            this.props.history.push('/');
+        } else {
+            console.log("error occurred while creating new course");
+        }
+        
     }
 
 
     render(){
-        console.log("context stuff");
-        console.log(this.context);
-        
+
         return(
             <div className="bounds course--detail">
                 <h1>Create Course</h1>

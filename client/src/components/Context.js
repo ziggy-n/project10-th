@@ -10,7 +10,10 @@ class Provider extends Component {
         this.state = {
             currentAuthUserEmail: Cookies.getJSON('currentAuthUserEmail') || null,
             currentAuthUserFirstName: Cookies.getJSON('currentAuthUserFirstName') || null,
-            currentAuthUserLastName: Cookies.getJSON('currentAuthUserLastName') || null
+            currentAuthUserLastName: Cookies.getJSON('currentAuthUserLastName') || null,
+            currentAuthUserPassword: Cookies.getJSON('currentAuthUserPassword') || null,
+            currentAuthUserId: Cookies.getJSON('currentAuthUserId') || null,
+            from: null
         }
     }
 
@@ -20,9 +23,13 @@ class Provider extends Component {
             currentAuthUserEmail: this.state.currentAuthUserEmail,
             currentAuthUserFirstName: this.state.currentAuthUserFirstName,
             currentAuthUserLastName: this.state.currentAuthUserLastName,
+            currentAuthUserPassword: this.state.currentAuthUserPassword,
+            currentAuthUserId: this.state.currentAuthUserId,
             actions: {
                 signUp: this.signUp,
-                signIn: this.signIn
+                signIn: this.signIn,
+                delete: this.delete,
+                setFrom: this.setFrom
             }
         };
 
@@ -32,6 +39,19 @@ class Provider extends Component {
             </MyContext.Provider>
         );
     }
+
+    // remember page visited before current one
+    setFrom = (x) => {
+        this.setState(
+            {from: x}
+        )
+    }
+
+    //
+    delete = async (course) => {
+
+    }
+
 
     // creates new user entry in data base
     // if sign up is successful, sets new user as authenticated user
@@ -45,12 +65,24 @@ class Provider extends Component {
         });
         
         if(response.status === 201){
+            const responseobj = response.json();
+
+            responseobj.then((obj) => {
+                this.setState({
+                    currentAuthUserEmail: data.emailAddress,
+                    currentAuthUserFirstName: obj.firstName,
+                    currentAuthUserLastName: obj.lastName,
+                    currentAuthUserPassword: data.password,
+                    currentAuthUserId: obj.id
+                });
+                Cookies.set('currentAuthUserEmail', JSON.stringify(data.emailAddress), { expires: 1 });
+                Cookies.set('currentAuthUserFirstName', JSON.stringify(obj.firstName), { expires: 1 });
+                Cookies.set('currentAuthUserLastName', JSON.stringify(obj.lastName), { expires: 1 });
+                Cookies.set('currentAuthUserPassword', JSON.stringify(data.password), { expires: 1 });
+                Cookies.set('currentAuthUserId', JSON.stringify(obj.id), { expires: 1 });
+            });
+
             console.log('successful sign up occurred');
-            this.setState({
-                currentAuthUserEmail: data.emailAddress,
-                currentAuthUserFirstName: data.firstName,
-                currentAuthUserLastName: data.lastName
-              })
         } else {
             console.log('error occurred posting user');
         }
@@ -77,17 +109,21 @@ class Provider extends Component {
         const response = await fetch('http://localhost:5000/api/users', options);
         
         if(response.status === 200){
-            const anw = response.json();
-            console.dir(anw);
-            anw.then((obj) => {
+            const responseobj = response.json();
+            console.dir(responseobj);
+            responseobj.then((obj) => {
                 this.setState({
-                    currentAuthUserEmail: obj.emailAddress,
+                    currentAuthUserEmail: data.emailAddress,
                     currentAuthUserFirstName: obj.firstName,
-                    currentAuthUserLastName: obj.lastName
+                    currentAuthUserLastName: obj.lastName,
+                    currentAuthUserPassword: data.password,
+                    currentAuthUserId: obj.id
                 });
-                Cookies.set('currentAuthUserEmail', JSON.stringify(obj.emailAddress), { expires: 1 });
+                Cookies.set('currentAuthUserEmail', JSON.stringify(data.emailAddress), { expires: 1 });
                 Cookies.set('currentAuthUserFirstName', JSON.stringify(obj.firstName), { expires: 1 });
                 Cookies.set('currentAuthUserLastName', JSON.stringify(obj.lastName), { expires: 1 });
+                Cookies.set('currentAuthUserPassword', JSON.stringify(data.password), { expires: 1 });
+                Cookies.set('currentAuthUserId', JSON.stringify(obj.id), { expires: 1 });
             });
             
             console.log('successful sign in occurred');

@@ -21,6 +21,5 @@ const Header = (props) => {
     );
 }
 
-Header.contextType = MyContext;
 
 export default Header;
