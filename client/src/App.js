@@ -37,57 +37,50 @@ class App extends React.Component {
 
     return(
       <Router>
-        <div className="root">
-          <div>
+        <div id="root">
             <Provider>
               <Header />
-            </Provider>
-            
-          </div>
-          <Switch>
-            <Provider>
 
-              <Route exact path="/signup" component={UserSignUp} /> 
-              
-              <Route exact path="/signin" render={ (props) => 
-                <UserSignIn
-                  {...props}
-                /> } 
-              />
-              <Route exact path="/signout" render={ (props) => 
-                <UserSignOut
-                  {...props}
-                /> } 
-              />
+              <Switch>
 
-              <Route exact path="/" render={ (props) => 
-                <Courses
-                  {...props}
-                /> } 
-              />
+                <Route exact path="/signup" component={UserSignUp} /> 
+                
+                <Route exact path="/signin" render={ (props) => 
+                  <UserSignIn
+                    {...props}
+                  /> } 
+                />
+                <Route exact path="/signout" render={ (props) => 
+                  <UserSignOut
+                    {...props}
+                  /> } 
+                />
 
-              <Route exact path="/courses/create" component={CreateCourse} /> 
+                <Route exact path="/" render={ (props) => 
+                  <Courses
+                    {...props}
+                  /> } 
+                />
+
+                <Route exact path="/courses/create" component={CreateCourse} /> 
 
 
-              <Route path="courses/:val/update" render={ (props) => 
-                <UpdateCourse 
-                  {...props}
-                /> } 
-              />
+                <Route path="/courses/:val/update" render={ (props) => 
+                  <UpdateCourse 
+                    {...props}
+                  /> } 
+                />
 
-              <Route path="courses/:val" render={ (props) => 
-                <CourseDetails 
-                  {...props}
-                /> } 
-              />
+                <Route path="/courses/:val" render={ (props) => 
+                  <CourseDetails 
+                    {...props}
+                  /> } 
+                />
+    
+                <Route component={NotFound} />
 
-              <Route component={NotFound} />
-              
-
-            </Provider>
-            
-            
-          </Switch>
+              </Switch>
+          </Provider>
         </div>
       </Router>
     );

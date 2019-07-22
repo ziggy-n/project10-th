@@ -133,6 +133,21 @@ class Provider extends Component {
  
     }
 
+    signOut = () => {
+        this.setState({
+            currentAuthUserEmail: null,
+            currentAuthUserFirstName: null,
+            currentAuthUserLastName: null,
+            currentAuthUserPassword: null,
+            currentAuthUserId: null,
+        });
+        Cookies.remove('currentAuthUserEmail');
+        Cookies.remove('currentAuthUserFirstName');
+        Cookies.remove('currentAuthUserLastName');
+        Cookies.remove('currentAuthUserPassword');
+        Cookies.remove('currentAuthUserId');
+    }
+
 
 }
 

@@ -84,7 +84,7 @@ class CourseDetails extends Component {
     }
 
     render(){
-        console.log("inside course detail render")
+        console.log("inside course detail render");
         let objOwner = this.state.ownerDetails;
         let objCourse = this.state.courseDetails;
 

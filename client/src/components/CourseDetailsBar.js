@@ -4,12 +4,7 @@ import { MyContext }  from './Context';
 
 
 class CourseDetailsBar extends Component {
-    
-    handleUpdate = (event) => {
-        event.preventDefault();
-        this.context.actions.setFrom(`/index/${this.props.courseId}`);
-        this.props.history.push(`/update_${this.props.courseId}`);
-    }
+
 
     handleDelete = (event) => {
         event.preventDefault();
@@ -25,10 +20,10 @@ class CourseDetailsBar extends Component {
             return(
                 <div className="grid-100">
                     <span>
-                        <Link className="button" to="" onClick={this.handleUpdate}>Update Course</Link>
+                        <Link className="button" to={`/courses/${this.props.courseId}/update`}>Update Course</Link>
                         <button className="button" onClick={this.handleDelete}>Delete Course</button>
                     </span>
-                    <Link className="button button--secondary" to="/index">Return to List</Link>
+                    <Link className="button button--secondary" to="/">Return to List</Link>
                 </div>
             );
         }
