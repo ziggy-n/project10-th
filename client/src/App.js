@@ -6,6 +6,7 @@ import {
   Switch
 } from 'react-router-dom';
 
+import { Provider } from './components/Context';
 
 //import TestComponent from './components/TestComponent';
 import Header from './components/Header';
@@ -13,7 +14,10 @@ import Courses from './components/Courses';
 import CourseDetails from './components/CourseDetail';
 import UserSignUp from './components/UserSignUp';
 import UserSignIn from './components/UserSignIn';
+import CreateCourse from './components/CreateCourse';
 
+//import { withContext } from './components/Context';
+//const HeaderWithContext = withContext(Header);
 
 
 class App extends React.Component {
@@ -32,6 +36,8 @@ class App extends React.Component {
     });
   }
 
+  
+
 
   render(){
 
@@ -39,33 +45,40 @@ class App extends React.Component {
       <Router>
         <div className="root">
           <div>
-            <Header />
+            <Provider>
+              <Header />
+            </Provider>
+            
           </div>
           <Switch>
-            <Route exact path="/signup" render={ (props) => 
-              <UserSignUp
-                
-                {...props}
-              /> } 
-            />
-            <Route exact path="/signin" render={ (props) => 
-              <UserSignIn
+            <Provider>
+              <Route exact path="/signup" component={UserSignUp} /> 
+              
+              <Route exact path="/signin" render={ (props) => 
+                <UserSignIn
 
-                {...props}
-              /> } 
-            />
-            <Route exact path="/index" render={ (props) => 
-              <Courses
-                setCourseSite={this.setCourseSite}
-                {...props}
-              /> } 
-            />
-            <Route path="/index/:val" render={ (props) => 
-              <CourseDetails 
-                courseId={this.state.courseSite}
-                {...props}
-              /> } 
-            />
+                  {...props}
+                /> } 
+              />
+
+              <Route exact path="/index" render={ (props) => 
+                <Courses
+                  setCourseSite={this.setCourseSite}
+                  {...props}
+                /> } 
+              />
+              <Route path="/index/:val" render={ (props) => 
+                <CourseDetails 
+                  courseId={this.state.courseSite}
+                  {...props}
+                /> } 
+              />
+
+              <Route path="/create-course" component={CreateCourse} /> 
+
+            </Provider>
+            
+            
           </Switch>
         </div>
       </Router>

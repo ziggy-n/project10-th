@@ -246,7 +246,7 @@ router.post('/courses', [authenticate, titleValidation, descriptionValidation],
             res.locals.errMsg = errMsgs;
             next(new Error());
         } else {
-            const courseData = req.body;
+            const courseData = req.body; 
             let id = null;
             await models.Course.create(courseData).then(function(course){
                 id = course.id;
@@ -266,21 +266,34 @@ router.get('/courses/:id', async (req, res, next) => {
 
     try{
         const idNr = req.params.id;
+        let userId = null;
+        let course = null;
+
         await models.Course.findOne({
             where: {id: idNr}
-        }).then(function(course){
-            if(course){
-                res.json(course);
+        }).then(function(foundCourse){
+            if(foundCourse){
+                console.dir(foundCourse);
+                userId = foundCourse.userId;
+                course = foundCourse;
             } else {
                 res.locals.errStatus = 400;
                 res.locals.errMsg = "No such course exists";
                 next(new Error());
             }
         });
+
+        await models.User.findOne({
+            where: {id: userId}
+        }).then(function(owner){
+            let temp = {course, owner};
+            res.json(temp);
+        })
     } catch (err){
         next(err);
     }
     
+
 });
 
 
