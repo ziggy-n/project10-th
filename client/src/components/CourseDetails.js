@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { MyContext }  from './Context';
 import Delete from  './Delete';
 import CourseDetailsBar from './CourseDetailsBar';
@@ -11,7 +10,8 @@ class CourseDetails extends Component {
         this.state = {
           courseDetails: {},
           ownerDetails: {},
-          askDelete: false
+          askDelete: false, 
+          notOwner: true
         }
     }
     
@@ -31,13 +31,19 @@ class CourseDetails extends Component {
                 console.log('error occurred fetching course details');
             });
 
-        console.log("course here: ");
-        console.dir(course);
-        console.dir(owner);
         this.setState({
             courseDetails: course,
             ownerDetails: owner
         });
+
+        if(this.state.ownerDetails.emailAddress === this.context.currentAuthUserEmail){
+            this.setState(
+                {notOwner: false}
+            )
+        }
+
+        
+
     }
 
 
@@ -83,48 +89,45 @@ class CourseDetails extends Component {
         
     }
 
+    structureText = (text) => {
+        let str = String(text);
+        let array = [];
+        let i = 0;
+        let wordBeginning = 0;
+        let wordEnd = 0;
+        while(i < str.length){
+            if(str.charAt(i) === "\n"){
+                wordEnd = i; 
+                array.push(str.substring(wordBeginning, wordEnd));
+                wordBeginning = i + 1;
+                wordEnd = i + 1;
+            }
+            i++;
+        }
+        array.push(str.substring(wordBeginning, str.length - 1));
+        return array;
+    }
+
+
+
     render(){
         console.log("inside course detail render");
         let objOwner = this.state.ownerDetails;
         let objCourse = this.state.courseDetails;
 
-        //console.log("check course number");
-        //console.log(this.props.match.params.val)
-
-        // console.log("console logging course obj");
-        // console.log(obj);
-        // console.log("type of materials needed");
-        // console.log(typeof obj.materialsNeeded);
-        
-        // parse materialsneeded from string to array
-        // let string = obj.materialsNeeded;
-        // let materialsArray = [];
-        // let chunkStart = 1;
-        // let chunkEnd = 1;
-        // console.log(string);
-        // console.dir(string);
-        
-        //let temp = string.length;
-        //console.log(string.length);
-
-        // for(let i = 1; i < string.length; i++){
-        //     while(string.charAt(i) !== "*" && i < string.length){
-        //         i++;
-        //     }
-        //     if(string.charAt(i) !== "*"){
-        //         chunkEnd = i-1;
-        //         materialsArray.push(string.substring(chunkStart, chunkEnd));
-        //         chunkStart = i + 1;
-        //         chunkEnd = chunkStart;
-        //     }
-            
-        // }
+        let materialsArray = this.structureText(this.state.courseDetails.materialsNeeded);
+        let descriptionArray = this.structureText(this.state.courseDetails.description);
 
         // make react component for materialsNeeded
-        // let materials = [];
-        // for(let i = 0; i < materialsArray.length; i++){
-        //     materials.push( <li> {materialsArray[i]} </li>);
-        // }
+        let materials = [];
+        for(let i = 0; i < materialsArray.length; i++){
+            materials.push( <li> {materialsArray[i]} </li>);
+        }
+        
+        let description = [];
+        for(let i = 0; i < descriptionArray.length; i++){
+            description.push( <p> {descriptionArray[i]} </p>);
+        }
 
         return(
             <div>
@@ -134,6 +137,7 @@ class CourseDetails extends Component {
                             askDelete={this.state.askDelete}
                             requestDelete={this.requestDelete}
                             courseId={this.props.match.params.val}
+                            notOwner={this.state.notOwner}
                         />
                         <Delete 
                             askDelete={this.state.askDelete} 
@@ -151,7 +155,7 @@ class CourseDetails extends Component {
                             <p>By {objOwner.firstName} {objOwner.lastName}</p>
                         </div>
                         <div className="course--description">
-                            <p>{objCourse.description}</p>
+                            {description}
                         </div>
                         <div className="grid-25 grid-right">
                             <div className="course--stats">
@@ -163,7 +167,7 @@ class CourseDetails extends Component {
                                     <li className="course--stats--list--item">
                                         <h4>Materials Needed</h4>
                                         <ul>
-                                           
+                                           {materials}
                                         </ul>
                                     </li>
                                 </ul>

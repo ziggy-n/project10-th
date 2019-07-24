@@ -17,7 +17,7 @@ class CreateCourse extends Component {
 
     handleSubmit = async (event) => {
         event.preventDefault();
-        
+
         const data = {
             title: this.titleInput.current.value,
             description: this.descriptionInput.current.value,

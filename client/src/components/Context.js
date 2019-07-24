@@ -13,12 +13,13 @@ class Provider extends Component {
             currentAuthUserLastName: Cookies.getJSON('currentAuthUserLastName') || null,
             currentAuthUserPassword: Cookies.getJSON('currentAuthUserPassword') || null,
             currentAuthUserId: Cookies.getJSON('currentAuthUserId') || null,
-            from: null
         }
+        // this.signIn = this.signIn.bind(this);
+        // this.signOut = this.signOut.bind(this);
+        // this.signUp = this.signUp.bind(this);
     }
 
     render(){
-        const { currentAuthUser } = this.state; 
         const value = {
             currentAuthUserEmail: this.state.currentAuthUserEmail,
             currentAuthUserFirstName: this.state.currentAuthUserFirstName,
@@ -28,8 +29,7 @@ class Provider extends Component {
             actions: {
                 signUp: this.signUp,
                 signIn: this.signIn,
-                delete: this.delete,
-                setFrom: this.setFrom
+                signOut: this.signOut
             }
         };
 
@@ -40,20 +40,8 @@ class Provider extends Component {
         );
     }
 
-    // remember page visited before current one
-    setFrom = (x) => {
-        this.setState(
-            {from: x}
-        )
-    }
 
-    //
-    delete = async (course) => {
-
-    }
-
-
-    // creates new user entry in data base
+    // creates new user entry in database
     // if sign up is successful, sets new user as authenticated user
     signUp = async (data)  => {
         console.log("signup function");
@@ -65,6 +53,8 @@ class Provider extends Component {
         });
         
         if(response.status === 201){
+            console.log("how a response looks like: ");
+            console.dir(response);
             const responseobj = response.json();
 
             responseobj.then((obj) => {
@@ -73,7 +63,7 @@ class Provider extends Component {
                     currentAuthUserFirstName: obj.firstName,
                     currentAuthUserLastName: obj.lastName,
                     currentAuthUserPassword: data.password,
-                    currentAuthUserId: obj.id
+                    currentAuthUserId: obj.id,
                 });
                 Cookies.set('currentAuthUserEmail', JSON.stringify(data.emailAddress), { expires: 1 });
                 Cookies.set('currentAuthUserFirstName', JSON.stringify(obj.firstName), { expires: 1 });
@@ -83,8 +73,12 @@ class Provider extends Component {
             });
 
             console.log('successful sign up occurred');
+            return null;
         } else {
             console.log('error occurred posting user');
+            let errorMsg = response.json();
+            console.log(errorMsg);
+            return null;
         }
  
     }
@@ -117,7 +111,7 @@ class Provider extends Component {
                     currentAuthUserFirstName: obj.firstName,
                     currentAuthUserLastName: obj.lastName,
                     currentAuthUserPassword: data.password,
-                    currentAuthUserId: obj.id
+                    currentAuthUserId: obj.id,
                 });
                 Cookies.set('currentAuthUserEmail', JSON.stringify(data.emailAddress), { expires: 1 });
                 Cookies.set('currentAuthUserFirstName', JSON.stringify(obj.firstName), { expires: 1 });
@@ -127,13 +121,16 @@ class Provider extends Component {
             });
             
             console.log('successful sign in occurred');
+            return null;
         } else {
             console.log('error occurred authenticating user');
+            return null;
         }
  
     }
 
-    signOut = () => {
+    signOut = async () => {
+        console.log("signout function");
         this.setState({
             currentAuthUserEmail: null,
             currentAuthUserFirstName: null,
@@ -146,6 +143,8 @@ class Provider extends Component {
         Cookies.remove('currentAuthUserLastName');
         Cookies.remove('currentAuthUserPassword');
         Cookies.remove('currentAuthUserId');
+        console.log("successful sign out occurred");
+        return null;
     }
 
 
@@ -153,19 +152,8 @@ class Provider extends Component {
 
 const Consumer = MyContext.Consumer;
 
-function withContext(Component){
-    return function ContextComponent(props){
-        return(
-            <MyContext.Consumer>
-                {context => <Component {...props} context={context} />}
-            </MyContext.Consumer>
-        );
-        
-    }
-}
-
 export {
     Provider,
-    MyContext,
-    withContext
+    Consumer,
+    MyContext
 }

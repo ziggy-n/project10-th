@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 
-import UserSignOut from './UserSignOut';
-
-
 class Courses extends Component {
 
     constructor(props){
@@ -19,14 +16,10 @@ class Courses extends Component {
             ).then(function(response){
                 return response.json();
             }).then(function(data){
-                console.log(data);
                 courses = data;
             }).catch(function(err){
                 console.log('error occurred fetching courses');
             });
-
-        console.log("courses here: ");
-        console.dir(courses);
         this.setState({
             courseList: courses
         });
@@ -35,8 +28,6 @@ class Courses extends Component {
 
     render(){
         let array = this.state.courseList;
-        console.log("console logging array of courses");
-        console.log(array);
         let rows = [];
         for(let i = 0; i < array.length; i++){
             rows.push( 
@@ -49,7 +40,6 @@ class Courses extends Component {
         }
         return(
             <div className="bounds">
-                <UserSignOut />
                 {rows}
                 <div className="grid-33"> 
                     <Link to={'/courses/create'} className="course--module course--add--module" >

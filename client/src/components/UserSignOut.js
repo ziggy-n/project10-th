@@ -1,22 +1,28 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { MyContext } from './Context';
+import { Redirect } from 'react-router-dom';
 
-const signout = () => {
-    console.log("in signout");
-    //{() => signout}
+// I know this was supposed to be a stateless component but I ran into a billion and one  
+// problems trying to keep it one. So I changed it. 
+
+class UserSignOut extends Component {
+
+    componentDidMount(){
+        this.context.actions.signOut();
+    }
+
+    render() {
+        return(
+            <React.Fragment>
+                <Redirect to={{
+                  pathname: '/'
+                }
+                } />
+            </React.Fragment>
+        );
+    }
 }
 
-const UserSignOut = (props) => {
-
-    return(
-            <MyContext.Consumer>
-                {context => (
-                    <React.Fragment>
-                        
-                    </React.Fragment>
-                )}
-            </MyContext.Consumer>
-    );
-}
-
+UserSignOut.contextType = MyContext;
 export default UserSignOut;
+

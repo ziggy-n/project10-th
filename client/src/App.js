@@ -17,6 +17,7 @@ import CreateCourse from './components/CreateCourse';
 import UpdateCourse from './components/UpdateCourse';
 import UserSignOut from './components/UserSignOut';
 import NotFound from './components/NotFound';
+import PrivateRoute from './components/PrivateRoute';
 
 //import { withContext } from './components/Context';
 //const HeaderWithContext = withContext(Header);
@@ -50,6 +51,7 @@ class App extends React.Component {
                     {...props}
                   /> } 
                 />
+
                 <Route exact path="/signout" render={ (props) => 
                   <UserSignOut
                     {...props}
@@ -62,14 +64,10 @@ class App extends React.Component {
                   /> } 
                 />
 
-                <Route exact path="/courses/create" component={CreateCourse} /> 
+                <PrivateRoute exact path="/courses/create" component={CreateCourse} /> 
 
 
-                <Route path="/courses/:val/update" render={ (props) => 
-                  <UpdateCourse 
-                    {...props}
-                  /> } 
-                />
+                <PrivateRoute path="/courses/:val/update" component={UpdateCourse}/>
 
                 <Route path="/courses/:val" render={ (props) => 
                   <CourseDetails 

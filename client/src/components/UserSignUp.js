@@ -5,10 +5,6 @@ import { MyContext }  from './Context';
 
 class UserSignUp extends Component {
 
-    constructor(props){
-        super(props);
-    }
-
     firstNameInput = React.createRef();
     lastNameInput = React.createRef();
     emailAddressInput = React.createRef();
@@ -21,7 +17,7 @@ class UserSignUp extends Component {
 
     } 
 
-    handleSubmit = (event) => {
+    handleSubmit = async (event) => {
         event.preventDefault();
         const data = {
             firstName: this.firstNameInput.current.value,
@@ -30,8 +26,8 @@ class UserSignUp extends Component {
             password:  this.passwordInput.current.value,
             confirmPassword:  this.firstNameInput.current.value
         }
-        this.context.actions.signUp(data);
-        //event.currentTaget.reset();
+        await this.context.actions.signUp(data);
+        this.props.history.push('/');
     }
 
 

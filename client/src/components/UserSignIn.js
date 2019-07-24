@@ -5,9 +5,6 @@ import { MyContext }  from './Context';
 
 class UserSignIn extends Component {
 
-    constructor(props){
-        super(props);
-    }
 
     emailAddressInput = React.createRef();
     passwordInput = React.createRef();
@@ -24,10 +21,13 @@ class UserSignIn extends Component {
             password:  this.passwordInput.current.value,
         }
         this.context.actions.signIn(data);
-        //event.currentTaget.reset();
+        this.props.history.push('/');
     }
 
     render(){
+        // this.setState({
+        //     from: this.props.location.state.from
+        // });
         return(
             <div className="bounds">
                 <div className="grid-33 centered signin">

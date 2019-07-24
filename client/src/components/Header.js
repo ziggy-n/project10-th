@@ -1,24 +1,36 @@
 import React from 'react';
 import { MyContext } from './Context';
+import { Link } from 'react-router-dom';
 
 const Header = (props) => {
-    console.log("header context props");
-    console.log(props);
+
     return(
         <div className="header">
             <div className="bounds">
                 <h1 className="header--logo">Courses</h1>
                     <MyContext.Consumer>
                         {context => (
-                            <nav>
-                                <span>Welcome {context.currentAuthUserFirstName}</span>
-                                <a className="signout" href="#">Sign Out</a>
-                            </nav>
+                            <React.Fragment>
+                                { context.currentAuthUserEmail ?
+                                    <nav>
+                                        <span>Welcome {context.currentAuthUserFirstName} {context.currentAuthUserLastName}!</span>
+                                        <Link className="signout" to="/signout">Sign Out</Link>
+                                    </nav>
+                                    :
+                                    <nav>
+                                        <Link className="signup" to="/signup">Sign Up</Link>
+                                        <Link className="signin" to="/signin">Sign In</Link>
+                                    </nav>
+                                }
+                            </React.Fragment>
+                            
                         )}
                     </MyContext.Consumer>
             </div>
         </div>
     );
+
+    
 }
 
 

@@ -16,6 +16,12 @@ class CourseDetailsBar extends Component {
             return(
                 <React.Fragment></React.Fragment>
             );
+        } else if (this.props.notOwner) {
+            return(
+                <div className="grid-100">
+                    <Link className="button button--secondary" to="/">Return to List</Link>
+                </div>
+            );
         } else {
             return(
                 <div className="grid-100">
