@@ -1,9 +1,18 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { MyContext }  from './Context';
-
+import ValidationError from './ValidationError';
 
 class UserSignUp extends Component {
+
+    constructor(props){
+        super(props);
+        this.state = {
+            valError: false,
+            errorMsg: null
+        }
+    }
+
 
     firstNameInput = React.createRef();
     lastNameInput = React.createRef();
@@ -13,21 +22,45 @@ class UserSignUp extends Component {
 
     
     handleCancel = (event) => {
-        event.preventDefault();
+        event.preventDefault();this.props.history.push('/');
 
     } 
 
     handleSubmit = async (event) => {
         event.preventDefault();
+
+        if(this.passwordInput.current.value !== this.passwordConfirmationInput.current.value){
+            console.log("passwords don't match");
+            this.setState({
+                valError: true,
+                errorMsg: "passwords don't match"
+            });
+            return;
+        }
+
         const data = {
             firstName: this.firstNameInput.current.value,
             lastName:  this.lastNameInput.current.value,
             emailAddress:  this.emailAddressInput.current.value,
             password:  this.passwordInput.current.value,
-            confirmPassword:  this.firstNameInput.current.value
         }
+
         await this.context.actions.signUp(data);
-        this.props.history.push('/');
+
+        if(this.context.errorMessage){
+            console.log("in signup handler before setting valError");
+            console.log(this.context.errorMessage)
+            this.setState({
+                valError: true,
+                errorMsg: this.context.errorMessage
+            })
+        } else {
+            this.setState({
+                valError: false,
+                errorMsg: null
+            })
+            this.props.history.push('/');
+        }
     }
 
 
@@ -38,6 +71,10 @@ class UserSignUp extends Component {
                 <div className="grid-33 centered signin">
                     <h1>Sign Up</h1>
                     <div>
+                        <ValidationError 
+                            valError={this.state.valError}
+                            errorMsg={this.state.errorMsg}
+                        />
                         <form onSubmit={this.handleSubmit}>
                             <div>
                                 <input id="firstName" name="firstName" type="text" placeholder="First Name"  ref={this.firstNameInput}/>
@@ -56,8 +93,8 @@ class UserSignUp extends Component {
                             </div>
                             <div className="grid-100 pad-bottom">
                                 <button className="button" type="submit" >Sign Up</button>
-                                <Link to='/index'> 
-                                    <button className="button button-secondary" onClick={this.handleCancel}>Cancel</button>
+                                <Link to='/'> 
+                                    <button className="button button-secondary">Cancel</button>
                                 </Link>
                                 
                             </div>

@@ -42,7 +42,6 @@ const emailFormatValidation = check('emailAddress')
 
 
 
-
 // middleware to check if provided email isn't already in database
 const uniqueEmailCheck = async (req, res, next) =>{
     try{
@@ -57,7 +56,7 @@ const uniqueEmailCheck = async (req, res, next) =>{
             });
             if(taken){
                 res.locals.errStatus = 400;
-                res.locals.errMsg = 'email already takend';
+                res.locals.errMsg = 'email already taken';
                 next(new Error());
             } else {
                 next();
@@ -170,6 +169,22 @@ router.get('/users', authenticate, async (req, res, next) => {
 
 });
 
+// REMOVE THIS. leave only for testing 
+router.get('/allusers', async (req, res, next) => {
+
+    try {
+        let listusers = null;
+        await models.User.findAll().then(function(list){
+            listusers = list;
+        });
+        res.json(listusers);
+
+
+    } catch(err){
+        next(err);
+    }
+
+});
 
 // creates a user, sets the Location header to "/" 
 // returns no content
@@ -186,7 +201,7 @@ router.post('/users', [firstNameValidation, lastNameValidation, emailAddressVali
         } else {
             if(req.body){
                 const user = req.body;
-                const newUser = null;
+                let newUser = null;
                 user.password = bcryptjs.hashSync(user.password);
                 await models.User.create(user).then(
                     result => newUser = result
@@ -362,6 +377,8 @@ router.delete('/courses/:id', [authenticate, permission], async  (req, res, next
         next(err);
     }
 });
+
+
 
 
 

@@ -1,9 +1,17 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { MyContext }  from './Context';
-
+import ValidationError from './ValidationError';
 
 class UserSignIn extends Component {
+
+    constructor(props){
+        super(props);
+        this.state = {
+            valError: false,
+            errorMsg: null
+        }
+    }
 
 
     emailAddressInput = React.createRef();
@@ -14,25 +22,36 @@ class UserSignIn extends Component {
 
     } 
 
-    handleSubmit = (event) => {
+    handleSubmit = async (event) => {
         event.preventDefault();
         const data = {
             emailAddress:  this.emailAddressInput.current.value,
             password:  this.passwordInput.current.value,
         }
-        this.context.actions.signIn(data);
-        this.props.history.push('/');
+        await this.context.actions.signIn(data);
+
+        if(this.context.errorMessage){
+            this.setState({
+                valError: true,
+                errorMsg: this.context.errorMessage
+            })
+        } else {
+            this.props.history.push('/');
+        }
+        
     }
 
     render(){
-        // this.setState({
-        //     from: this.props.location.state.from
-        // });
+
         return(
             <div className="bounds">
                 <div className="grid-33 centered signin">
                     <h1>Sign In</h1>
                     <div>
+                        <ValidationError 
+                            valError={this.state.valError}
+                            errorMsg={this.state.errorMsg}
+                        />
                         <form onSubmit={this.handleSubmit}>
                             <div>
                                 <input id="emailAddress" name="emailAddress" type="text" placeholder="Email Address" ref={this.emailAddressInput} />

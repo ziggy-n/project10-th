@@ -13,6 +13,7 @@ class Provider extends Component {
             currentAuthUserLastName: Cookies.getJSON('currentAuthUserLastName') || null,
             currentAuthUserPassword: Cookies.getJSON('currentAuthUserPassword') || null,
             currentAuthUserId: Cookies.getJSON('currentAuthUserId') || null,
+            errorMessage: Cookies.getJSON('errorMessage') || null
         }
         // this.signIn = this.signIn.bind(this);
         // this.signOut = this.signOut.bind(this);
@@ -26,6 +27,7 @@ class Provider extends Component {
             currentAuthUserLastName: this.state.currentAuthUserLastName,
             currentAuthUserPassword: this.state.currentAuthUserPassword,
             currentAuthUserId: this.state.currentAuthUserId,
+            errorMessage: this.state.errorMessage,
             actions: {
                 signUp: this.signUp,
                 signIn: this.signIn,
@@ -43,48 +45,73 @@ class Provider extends Component {
 
     // creates new user entry in database
     // if sign up is successful, sets new user as authenticated user
-    signUp = async (data)  => {
+    signUp = async (userData)  => {
         console.log("signup function");
 
-        const response = await fetch('http://localhost:5000/api/users', {
+        const bodyOfData = {};
+
+        if(userData.firstName){
+            bodyOfData.firstName = userData.firstName;
+        } 
+
+        if(userData.lastName){
+            bodyOfData.lastName = userData.lastName;
+        }
+
+        if(userData.emailAddress){
+            bodyOfData.emailAddress = userData.emailAddress;
+        }
+
+        if(userData.password){
+            bodyOfData.password = userData.password;
+        }   
+        
+
+        let responseobj = null;
+        await fetch('http://localhost:5000/api/users', {
             method: 'POST', 
             headers: {'Content-Type': 'application/json; charset=utf-8',},
-            body: JSON.stringify(data)
-        });
-        
-        if(response.status === 201){
-            console.log("how a response looks like: ");
-            console.dir(response);
-            const responseobj = response.json();
-
-            responseobj.then((obj) => {
+            body: JSON.stringify(bodyOfData)
+        }).then(response => {
+            responseobj = response;
+            return response.json();
+        }).then(data => {
+            if(responseobj.status === 201){
                 this.setState({
-                    currentAuthUserEmail: data.emailAddress,
-                    currentAuthUserFirstName: obj.firstName,
-                    currentAuthUserLastName: obj.lastName,
-                    currentAuthUserPassword: data.password,
-                    currentAuthUserId: obj.id,
+                    currentAuthUserEmail: userData.emailAddress,
+                    currentAuthUserFirstName: data.firstName,
+                    currentAuthUserLastName: data.lastName,
+                    currentAuthUserPassword: userData.password,
+                    currentAuthUserId: data.id,
+                    errorMessage: null
                 });
-                Cookies.set('currentAuthUserEmail', JSON.stringify(data.emailAddress), { expires: 1 });
-                Cookies.set('currentAuthUserFirstName', JSON.stringify(obj.firstName), { expires: 1 });
-                Cookies.set('currentAuthUserLastName', JSON.stringify(obj.lastName), { expires: 1 });
-                Cookies.set('currentAuthUserPassword', JSON.stringify(data.password), { expires: 1 });
-                Cookies.set('currentAuthUserId', JSON.stringify(obj.id), { expires: 1 });
-            });
+                Cookies.set('currentAuthUserEmail', JSON.stringify(userData.emailAddress), { expires: 1 });
+                Cookies.set('currentAuthUserFirstName', JSON.stringify(data.firstName), { expires: 1 });
+                Cookies.set('currentAuthUserLastName', JSON.stringify(data.lastName), { expires: 1 });
+                Cookies.set('currentAuthUserPassword', JSON.stringify(userData.password), { expires: 1 });
+                Cookies.set('currentAuthUserId', JSON.stringify(data.id), { expires: 1 });
+                Cookies.remove('errorMessage');
 
-            console.log('successful sign up occurred');
-            return null;
-        } else {
-            console.log('error occurred posting user');
-            let errorMsg = response.json();
-            console.log(errorMsg);
-            return null;
-        }
- 
+                console.log('successful sign up occurred');
+            } else {
+                console.log("error occurred signing up");
+                this.setState({
+                    errorMessage: data.error.message
+                });
+                Cookies.set('errorMessage', JSON.stringify(data.error.message), { expires: 1 });
+            }
+        }).catch(err => {
+            console.log("api request failed");
+            this.setState({
+                errorMessage: "api request failed"
+            });
+            Cookies.set('errorMessage', JSON.stringify("api request failed"), { expires: 1 });
+        });
+
     }
 
 
-    signIn = async (data)  => {
+    signIn = async (userData)  => {
         console.log("signin function");
 
         // set options
@@ -95,37 +122,48 @@ class Provider extends Component {
         }
 
         // dealing with credentials
-        const encodedCredentials = btoa(`${data.emailAddress}:${data.password}`);
+        const encodedCredentials = btoa(`${userData.emailAddress}:${userData.password}`);
         options.headers['Authorization'] = `Basic ${encodedCredentials}`;
 
 
-        // check if email matches password
-        const response = await fetch('http://localhost:5000/api/users', options);
-        
-        if(response.status === 200){
-            const responseobj = response.json();
-            console.dir(responseobj);
-            responseobj.then((obj) => {
+        // 
+        let responseobj = null;
+        await fetch('http://localhost:5000/api/users', options)
+            .then(response => {
+                responseobj = response;
+                return response.json();
+            }).then(data => {
+                if(responseobj.status === 200){
+                    this.setState({
+                        currentAuthUserEmail: userData.emailAddress,
+                        currentAuthUserFirstName: data.firstName,
+                        currentAuthUserLastName: data.lastName,
+                        currentAuthUserPassword: userData.password,
+                        currentAuthUserId: data.id,
+                        errorMessage: null
+                    });
+                    Cookies.set('currentAuthUserEmail', JSON.stringify(userData.emailAddress), { expires: 1 });
+                    Cookies.set('currentAuthUserFirstName', JSON.stringify(data.firstName), { expires: 1 });
+                    Cookies.set('currentAuthUserLastName', JSON.stringify(data.lastName), { expires: 1 });
+                    Cookies.set('currentAuthUserPassword', JSON.stringify(userData.password), { expires: 1 });
+                    Cookies.set('currentAuthUserId', JSON.stringify(data.id), { expires: 1 });
+                    Cookies.remove('errorMessage');
+
+                    console.log('successful sign in occurred');
+                } else {
+                    console.log("error occurred signing in");
+                    this.setState({
+                        errorMessage: data.error.message
+                    });
+                    Cookies.set('errorMessage', JSON.stringify(data.error.message), { expires: 1 });
+                }
+            }).catch(err => {
+                console.log("api request failed");
                 this.setState({
-                    currentAuthUserEmail: data.emailAddress,
-                    currentAuthUserFirstName: obj.firstName,
-                    currentAuthUserLastName: obj.lastName,
-                    currentAuthUserPassword: data.password,
-                    currentAuthUserId: obj.id,
+                    errorMessage: "api request failed"
                 });
-                Cookies.set('currentAuthUserEmail', JSON.stringify(data.emailAddress), { expires: 1 });
-                Cookies.set('currentAuthUserFirstName', JSON.stringify(obj.firstName), { expires: 1 });
-                Cookies.set('currentAuthUserLastName', JSON.stringify(obj.lastName), { expires: 1 });
-                Cookies.set('currentAuthUserPassword', JSON.stringify(data.password), { expires: 1 });
-                Cookies.set('currentAuthUserId', JSON.stringify(obj.id), { expires: 1 });
+                Cookies.set('errorMessage', JSON.stringify("api request failed"), { expires: 1 });
             });
-            
-            console.log('successful sign in occurred');
-            return null;
-        } else {
-            console.log('error occurred authenticating user');
-            return null;
-        }
  
     }
 
@@ -148,6 +186,12 @@ class Provider extends Component {
     }
 
 
+    dealWithError(){
+    
+    }    
+
+
+
 }
 
 const Consumer = MyContext.Consumer;
@@ -157,3 +201,93 @@ export {
     Consumer,
     MyContext
 }
+
+
+// signUp = async (data)  => {
+//     console.log("signup function");
+
+//     const response = await fetch('http://localhost:5000/api/users', {
+//         method: 'POST', 
+//         headers: {'Content-Type': 'application/json; charset=utf-8',},
+//         body: JSON.stringify(data)
+//     });
+
+//     console.log("how a response looks like: ");
+//     console.dir(response);
+
+//     if(response.status === 201){
+//         const responseobj = response.json();
+
+//         responseobj.then((obj) => {
+//             this.setState({
+//                 currentAuthUserEmail: data.emailAddress,
+//                 currentAuthUserFirstName: obj.firstName,
+//                 currentAuthUserLastName: obj.lastName,
+//                 currentAuthUserPassword: data.password,
+//                 currentAuthUserId: obj.id,
+//             });
+//             Cookies.set('currentAuthUserEmail', JSON.stringify(data.emailAddress), { expires: 1 });
+//             Cookies.set('currentAuthUserFirstName', JSON.stringify(obj.firstName), { expires: 1 });
+//             Cookies.set('currentAuthUserLastName', JSON.stringify(obj.lastName), { expires: 1 });
+//             Cookies.set('currentAuthUserPassword', JSON.stringify(data.password), { expires: 1 });
+//             Cookies.set('currentAuthUserId', JSON.stringify(obj.id), { expires: 1 });
+//         });
+
+//         console.log('successful sign up occurred');
+//         return null;
+//     } else {
+//         console.log('error occurred posting user');
+//         //dealWithError();
+//         let errorMsg = response.json();
+//         console.log(errorMsg);
+//         return null;
+//     }
+
+// }
+
+
+
+// signIn = async (data)  => {
+//     console.log("signin function");
+
+//     // set options
+//     const options = {
+//         method: 'GET',
+//         headers: {'Content-Type': 'application/json; charset=utf-8',},
+//         body: null
+//     }
+
+//     // dealing with credentials
+//     const encodedCredentials = btoa(`${data.emailAddress}:${data.password}`);
+//     options.headers['Authorization'] = `Basic ${encodedCredentials}`;
+
+
+//     // check if email matches password
+//     let response = await fetch('http://localhost:5000/api/users', options);
+    
+//     if(response.status === 200){
+//         const responseobj = response.json();
+//         console.dir(responseobj);
+//         responseobj.then((obj) => {
+//             this.setState({
+//                 currentAuthUserEmail: data.emailAddress,
+//                 currentAuthUserFirstName: obj.firstName,
+//                 currentAuthUserLastName: obj.lastName,
+//                 currentAuthUserPassword: data.password,
+//                 currentAuthUserId: obj.id,
+//             });
+//             Cookies.set('currentAuthUserEmail', JSON.stringify(data.emailAddress), { expires: 1 });
+//             Cookies.set('currentAuthUserFirstName', JSON.stringify(obj.firstName), { expires: 1 });
+//             Cookies.set('currentAuthUserLastName', JSON.stringify(obj.lastName), { expires: 1 });
+//             Cookies.set('currentAuthUserPassword', JSON.stringify(data.password), { expires: 1 });
+//             Cookies.set('currentAuthUserId', JSON.stringify(obj.id), { expires: 1 });
+//         });
+        
+//         console.log('successful sign in occurred');
+//         return null;
+//     } else {
+//         console.log('error occurred authenticating user');
+//         return null;
+//     }
+
+// }
