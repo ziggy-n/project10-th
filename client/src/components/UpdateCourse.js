@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { MyContext } from './Context';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import ValidationError from './ValidationError';
 
 
@@ -41,8 +41,10 @@ class UpdateCourse extends Component {
             courseId: id
         })
 
+        let status = null;
         await fetch(`http://localhost:5000/api/courses/${id}`
             ).then(function(response){
+                status = response.status;
                 return response.json();
             }).then(function(data){
                 owner = data.owner;
@@ -54,6 +56,17 @@ class UpdateCourse extends Component {
         console.log("course here: ");
         console.dir(course);
         console.dir(owner);
+        
+        if(!course){
+            this.props.history.push('/notfound');
+            return null;
+        }
+
+        if(status === 500){
+            this.props.history.push('/error');
+            return null;
+        }
+
         this.setState({
             ownerFirstName: owner.firstName || "",
             ownerLastName: owner.lastname || "",
@@ -150,11 +163,12 @@ class UpdateCourse extends Component {
         options.headers['Authorization'] = `Basic ${encodedCredentials}`;
 
 
+        let status = null;
         // 
         await fetch(`http://localhost:5000/api/courses/${this.state.courseId}`, options)
         .then(response => {
             console.log("first then");
-            
+            status = response.status;
             if(response.status === 204){
                 this.setState({
                     valError: false,
@@ -198,6 +212,10 @@ class UpdateCourse extends Component {
             });
         });
 
+        if(status === 500){
+            this.props.history.push('/error');
+        }
+
     }
 
 
@@ -205,18 +223,6 @@ class UpdateCourse extends Component {
     render() {
         console.log("inside update course render");
 
-        if(this.context.currentAuthUserId !== this.state.ownerId){
-            return(
-                <React.Fragment>
-                    <Redirect to={{
-                        pathname: '/forbidden',
-                        state: {from: this.props.location}
-                        }
-                    } />
-                </React.Fragment>
-            );
-            
-        } else {
             return(
                 <div className="bounds course--detail">
                     <h1>Update Course</h1>
@@ -267,8 +273,7 @@ class UpdateCourse extends Component {
                     </div>
                 </div>
             );
-        }
-        
+
     }
 }
 

@@ -47,6 +47,10 @@ class UserSignIn extends Component {
 
         await this.context.actions.signIn(data);
 
+        if(this.context.status === 500){
+            this.props.history.push('/error');
+        }
+        
         if(this.context.errorMessage){
             this.setState({
                 valError: true,

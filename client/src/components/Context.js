@@ -15,6 +15,7 @@ class Provider extends Component {
             currentAuthUserId: Cookies.getJSON('currentAuthUserId') || null,
             errorMessage: Cookies.getJSON('errorMessage') || null,
             errorIsString: Cookies.getJSON('errorIsString') || null,
+            status: Cookies.getJSON('status') || null,
         }
         // this.signIn = this.signIn.bind(this);
         // this.signOut = this.signOut.bind(this);
@@ -30,6 +31,7 @@ class Provider extends Component {
             currentAuthUserId: this.state.currentAuthUserId,
             errorMessage: this.state.errorMessage,
             errorIsString: this.state.errorIsString,
+            status: this.state.status,
             actions: {
                 signUp: this.signUp,
                 signIn: this.signIn,
@@ -76,6 +78,9 @@ class Provider extends Component {
             body: JSON.stringify(bodyOfData)
         }).then(response => {
             responseobj = response;
+            this.setState(
+                {status: response.status}
+            )
             return response.json();
         }).then(data => {
             if(responseobj.status === 201){
@@ -112,8 +117,9 @@ class Provider extends Component {
                     });
                     Cookies.set('errorIsString', JSON.stringify(false), { expires: 1 });
                 }
-                
+            
                 Cookies.set('errorMessage', JSON.stringify(data.error.message), { expires: 1 });
+                
             }
         }).catch(err => {
             console.log("api request failed");
@@ -122,6 +128,7 @@ class Provider extends Component {
             });
             Cookies.set('errorMessage', JSON.stringify("api request failed"), { expires: 1 });
             Cookies.set('errorIsString', JSON.stringify(true), { expires: 1 });
+ 
         });
 
     }
@@ -146,6 +153,9 @@ class Provider extends Component {
         let responseobj = null;
         await fetch('http://localhost:5000/api/users', options)
             .then(response => {
+                this.setState(
+                    {status: response.status}
+                )
                 responseobj = response;
                 return response.json();
             }).then(data => {

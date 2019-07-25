@@ -48,9 +48,15 @@ class UserSignUp extends Component {
 
         await this.context.actions.signUp(data);
 
+        if(this.context.status === 500){
+            this.props.history.push('/error');
+        }
+
+
         if(this.context.errorMessage){
             console.log("in signup handler before setting valError");
             console.log(this.context.errorMessage);
+
             this.setState({
                 valError: true,
                 errorMsg: this.context.errorMessage,

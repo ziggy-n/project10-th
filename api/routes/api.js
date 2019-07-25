@@ -153,6 +153,7 @@ const permission = async (req, res, next) => {
 router.get('/users', authenticate, async (req, res, next) => {
 
     try {
+        
         let listusers = null;
         await models.User.findAll({ 
             attributes: ['id', 'firstName', 'lastName', 'emailAddress']
@@ -192,6 +193,7 @@ router.post('/users', [firstNameValidation, lastNameValidation, emailAddressVali
     async (req, res, next) => {
 
     try{ 
+        
         const errors = validationResult(req).errors;
         if(errors.length > 0){
             const errMsgs = errors.map(err => err.msg);
@@ -232,6 +234,7 @@ router.post('/users', [firstNameValidation, lastNameValidation, emailAddressVali
 router.get('/courses', async (req, res, next) => {
     let listcourses;
     try{
+        
         await models.Course.findAll({
             attributes: [
                 "id",
@@ -257,6 +260,7 @@ router.get('/courses', async (req, res, next) => {
 router.post('/courses', [authenticate, titleValidation, descriptionValidation], 
     async (req, res, next) => {
     try{
+        
         console.log("in post course route");
         const errors = validationResult(req);
 
@@ -290,6 +294,7 @@ router.post('/courses', [authenticate, titleValidation, descriptionValidation],
 router.get('/courses/:id', async (req, res, next) => {
 
     try{
+        
         const idNr = req.params.id;
         let userId = null;
         let course = null;
@@ -329,7 +334,6 @@ router.get('/courses/:id', async (req, res, next) => {
 router.put('/courses/:id', [authenticate, permission, titleValidation, descriptionValidation], async (req, res, next) => {
     
     try {
-
         const errors = validationResult(req);
             
         if(!errors.isEmpty){
@@ -371,6 +375,7 @@ router.put('/courses/:id', [authenticate, permission, titleValidation, descripti
 // returns no content
 router.delete('/courses/:id', [authenticate, permission], async  (req, res, next) => {
     try {
+ 
         const id = req.params.id;
         await models.Course.findByPk(id).then(function(course){
             if(course){

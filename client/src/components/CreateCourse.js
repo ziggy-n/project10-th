@@ -56,10 +56,13 @@ class CreateCourse extends Component {
 
 
         // 
+        let status = null;
         await fetch('http://localhost:5000/api/courses', options)
             .then(response => {
                 console.log("first then");
                 
+                status = response.status;
+
                 if(response.status === 201){
                     this.setState({
                         valError: false,
@@ -103,6 +106,9 @@ class CreateCourse extends Component {
                 });
             });
         
+            if(status === 500) {
+                this.props.history.push('/error');
+            }
     }
 
 

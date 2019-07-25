@@ -11,15 +11,21 @@ class Courses extends Component {
     }
     
     async componentDidMount(){
+        let status = null;
         let courses = null;
         await fetch('http://localhost:5000/api/courses'
             ).then(function(response){
+                status = response.status;
                 return response.json();
             }).then(function(data){
                 courses = data;
             }).catch(function(err){
                 console.log('error occurred fetching courses');
             });
+        
+        if(status === 500){
+            this.props.history.push('/error');
+        }
         this.setState({
             courseList: courses
         });
