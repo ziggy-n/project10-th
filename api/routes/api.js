@@ -326,28 +326,39 @@ router.get('/courses/:id', async (req, res, next) => {
 // updates a course
 // returns no content
 // can only be used by user that owns route
-router.put('/courses/:id', [authenticate, permission], async (req, res, next) => {
+router.put('/courses/:id', [authenticate, permission, titleValidation, descriptionValidation], async (req, res, next) => {
     
     try {
-        
-        const id = req.params.id;
-        const update = req.body;
-        if(update){
-            await models.Course.findByPk(id).then(function(course){
-                if(course){
-                    return course.update(update);
-                } else {
-                    res.locals.errStatus = 400;
-                    res.locals.errMsg = "No such course exists";
-                    next(new Error());
-                }
-            });        
-            res.status(204).end();
-        } else {
+
+        const errors = validationResult(req);
+            
+        if(!errors.isEmpty){
+            console.log("validation error occurred");
+            const errMsgs = errors.array().map(err => err.msg);
             res.locals.errStatus = 400;
-            res.locals.errMsg = "update data is missing";
+            res.locals.errMsg = errMsgs;
             next(new Error());
+        } else {
+            const id = req.params.id;
+            const update = req.body;
+            if(update){
+                await models.Course.findByPk(id).then(function(course){
+                    if(course){
+                        return course.update(update);
+                    } else {
+                        res.locals.errStatus = 400;
+                        res.locals.errMsg = "No such course exists";
+                        next(new Error());
+                    }
+                });        
+                res.status(204).end();
+            } else {
+                res.locals.errStatus = 400;
+                res.locals.errMsg = "update data is missing";
+                next(new Error());
+            }
         }
+        
         
     } catch(err){
         next(err);

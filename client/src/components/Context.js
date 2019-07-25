@@ -13,7 +13,8 @@ class Provider extends Component {
             currentAuthUserLastName: Cookies.getJSON('currentAuthUserLastName') || null,
             currentAuthUserPassword: Cookies.getJSON('currentAuthUserPassword') || null,
             currentAuthUserId: Cookies.getJSON('currentAuthUserId') || null,
-            errorMessage: Cookies.getJSON('errorMessage') || null
+            errorMessage: Cookies.getJSON('errorMessage') || null,
+            errorIsString: Cookies.getJSON('errorIsString') || null,
         }
         // this.signIn = this.signIn.bind(this);
         // this.signOut = this.signOut.bind(this);
@@ -28,6 +29,7 @@ class Provider extends Component {
             currentAuthUserPassword: this.state.currentAuthUserPassword,
             currentAuthUserId: this.state.currentAuthUserId,
             errorMessage: this.state.errorMessage,
+            errorIsString: this.state.errorIsString,
             actions: {
                 signUp: this.signUp,
                 signIn: this.signIn,
@@ -83,7 +85,8 @@ class Provider extends Component {
                     currentAuthUserLastName: data.lastName,
                     currentAuthUserPassword: userData.password,
                     currentAuthUserId: data.id,
-                    errorMessage: null
+                    errorMessage: null,
+                    errorIsString: null
                 });
                 Cookies.set('currentAuthUserEmail', JSON.stringify(userData.emailAddress), { expires: 1 });
                 Cookies.set('currentAuthUserFirstName', JSON.stringify(data.firstName), { expires: 1 });
@@ -91,13 +94,25 @@ class Provider extends Component {
                 Cookies.set('currentAuthUserPassword', JSON.stringify(userData.password), { expires: 1 });
                 Cookies.set('currentAuthUserId', JSON.stringify(data.id), { expires: 1 });
                 Cookies.remove('errorMessage');
+                Cookies.remove('errorIsString');
 
                 console.log('successful sign up occurred');
             } else {
                 console.log("error occurred signing up");
-                this.setState({
-                    errorMessage: data.error.message
-                });
+                if(typeof data.error.message === 'string'){
+                    this.setState({
+                        errorMessage: data.error.message,
+                        errorIsString: true
+                    });
+                    Cookies.set('errorIsString', JSON.stringify(true), { expires: 1 });
+                } else {
+                    this.setState({
+                        errorMessage: data.error.message,
+                        errorIsString: false
+                    });
+                    Cookies.set('errorIsString', JSON.stringify(false), { expires: 1 });
+                }
+                
                 Cookies.set('errorMessage', JSON.stringify(data.error.message), { expires: 1 });
             }
         }).catch(err => {
@@ -106,6 +121,7 @@ class Provider extends Component {
                 errorMessage: "api request failed"
             });
             Cookies.set('errorMessage', JSON.stringify("api request failed"), { expires: 1 });
+            Cookies.set('errorIsString', JSON.stringify(true), { expires: 1 });
         });
 
     }
@@ -140,7 +156,8 @@ class Provider extends Component {
                         currentAuthUserLastName: data.lastName,
                         currentAuthUserPassword: userData.password,
                         currentAuthUserId: data.id,
-                        errorMessage: null
+                        errorMessage: null,
+                        errorIsString: false
                     });
                     Cookies.set('currentAuthUserEmail', JSON.stringify(userData.emailAddress), { expires: 1 });
                     Cookies.set('currentAuthUserFirstName', JSON.stringify(data.firstName), { expires: 1 });
@@ -148,21 +165,35 @@ class Provider extends Component {
                     Cookies.set('currentAuthUserPassword', JSON.stringify(userData.password), { expires: 1 });
                     Cookies.set('currentAuthUserId', JSON.stringify(data.id), { expires: 1 });
                     Cookies.remove('errorMessage');
+                    Cookies.remove('errorIsString');
 
                     console.log('successful sign in occurred');
                 } else {
                     console.log("error occurred signing in");
-                    this.setState({
-                        errorMessage: data.error.message
-                    });
+                    if(typeof data.error.message === 'string'){
+                        this.setState({
+                            errorMessage: data.error.message,
+                            errorIsString: true
+                        });
+                        Cookies.set('errorIsString', JSON.stringify(true), { expires: 1 });
+                    } else {
+                        this.setState({
+                            errorMessage: data.error.message,
+                            errorIsString: false
+                        });
+                        Cookies.set('errorIsString', JSON.stringify(false), { expires: 1 });
+                    }
+                    
                     Cookies.set('errorMessage', JSON.stringify(data.error.message), { expires: 1 });
                 }
             }).catch(err => {
                 console.log("api request failed");
                 this.setState({
-                    errorMessage: "api request failed"
+                    errorMessage: "api request failed",
+                    errorIsString: true
                 });
                 Cookies.set('errorMessage', JSON.stringify("api request failed"), { expires: 1 });
+                Cookies.set('errorIsString', JSON.stringify(true), { expires: 1 });
             });
  
     }
@@ -184,12 +215,6 @@ class Provider extends Component {
         console.log("successful sign out occurred");
         return null;
     }
-
-
-    dealWithError(){
-    
-    }    
-
 
 
 }

@@ -1,8 +1,18 @@
 import React, { Component } from 'react';
 import { MyContext }  from './Context';
-import ValidationErrorsCreateCourse from './ValidationErrorsCreateCourse';
+import ValidationError from './ValidationError';
 
 class CreateCourse extends Component {
+
+    constructor(props){
+        super(props);
+        this.state = {
+            valError: false,
+            errorMsg: null,
+            errorIsString: false
+        }
+    }
+
 
     titleInput = React.createRef();
     descriptionInput = React.createRef();
@@ -16,14 +26,21 @@ class CreateCourse extends Component {
     }
 
     handleSubmit = async (event) => {
+        
         event.preventDefault();
 
         const data = {
-            title: this.titleInput.current.value,
-            description: this.descriptionInput.current.value,
             estimatedTime: this.estimatedTimeInput.current.value,
             materialsNeeded: this.materialsNeededInput.current.value,
             userId: this.context.currentAuthUserId
+        }
+
+        if(this.titleInput.current.value){
+            data.title = this.titleInput.current.value;
+        }
+
+        if(this.descriptionInput.current.value){
+            data.description = this.descriptionInput.current.value
         }
 
         // set options
@@ -39,14 +56,52 @@ class CreateCourse extends Component {
 
 
         // 
-        const response = await fetch('http://localhost:5000/api/courses', options);
+        await fetch('http://localhost:5000/api/courses', options)
+            .then(response => {
+                console.log("first then");
+                
+                if(response.status === 201){
+                    this.setState({
+                        valError: false,
+                        errorMsg: null,
+                        errorIsString: false
+                    });
+                    console.log('successful course creation occurred');
+                    
+                    this.props.history.push('/');
 
-        if(response.status === 201){
-            console.log("new course successfully created");
-            this.props.history.push('/');
-        } else {
-            console.log("error occurred while creating new course");
-        }
+                } else {
+                    return response.json();
+                }
+
+            }).then(data => {
+                console.log("second then");
+                if(data.error.message){
+                    console.log("error occurred during course creation");
+                    if(typeof data.error.message === 'string'){
+                        this.setState({
+                            valError: true,
+                            errorMsg: data.error.message,
+                            errorIsString: true
+                        });
+                    } else {
+                        this.setState({
+                            valError: true,
+                            errorMsg: data.error.message,
+                            errorIsString: false
+                        });
+                    }
+                    
+                    
+                }
+            }).catch(err => {
+                console.log("api request failed");
+                this.setState({
+                    valError: true,
+                    errorMsg: "api request failed",
+                    errorIsString: true
+                });
+            });
         
     }
 
@@ -57,7 +112,11 @@ class CreateCourse extends Component {
             <div className="bounds course--detail">
                 <h1>Create Course</h1>
                 <div>
-                    <ValidationErrorsCreateCourse />
+                    <ValidationError 
+                            valError={this.state.valError}
+                            errorMsg={this.state.errorMsg}
+                            errorIsString={this.state.errorIsString}
+                    />
                     <form onSubmit={this.handleSubmit}>
                         <div className="grid-66">
                             <div className="course--header">

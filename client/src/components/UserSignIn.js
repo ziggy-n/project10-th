@@ -9,7 +9,8 @@ class UserSignIn extends Component {
         super(props);
         this.state = {
             valError: false,
-            errorMsg: null
+            errorMsg: null,
+            errorIsString: false
         }
     }
 
@@ -24,19 +25,36 @@ class UserSignIn extends Component {
 
     handleSubmit = async (event) => {
         event.preventDefault();
+
+        console.log("inside handlesubmit usersignin");
+        console.log(this.props.location);
+
+        const { from } = this.props.location.state || { from: { pathname: '/'}};
+
         const data = {
             emailAddress:  this.emailAddressInput.current.value,
             password:  this.passwordInput.current.value,
         }
+
+        if(data.emailAddress === "" && data.password === ""){
+            this.setState({
+                valError: true,
+                errorMsg: "Access Denied",
+                errorIsString: true
+            })
+            return null;
+        }
+
         await this.context.actions.signIn(data);
 
         if(this.context.errorMessage){
             this.setState({
                 valError: true,
-                errorMsg: this.context.errorMessage
+                errorMsg: this.context.errorMessage,
+                errorIsString: this.context.errorIsString
             })
         } else {
-            this.props.history.push('/');
+            this.props.history.push(from);
         }
         
     }
@@ -51,6 +69,7 @@ class UserSignIn extends Component {
                         <ValidationError 
                             valError={this.state.valError}
                             errorMsg={this.state.errorMsg}
+                            errorIsString={this.state.errorIsString}
                         />
                         <form onSubmit={this.handleSubmit}>
                             <div>
@@ -61,8 +80,8 @@ class UserSignIn extends Component {
                             </div>
                             <div className="grid-100 pad-bottom">
                                 <button className="button" type="submit">Sign In</button>
-                                <Link to='/index'> 
-                                    <button className="button button-secondary" onClick={this.handleCancel}>Cancel</button>
+                                <Link to='/'> 
+                                    <button className="button button-secondary">Cancel</button>
                                 </Link>    
                             </div>
                         </form>

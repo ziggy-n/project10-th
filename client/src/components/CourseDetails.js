@@ -104,7 +104,7 @@ class CourseDetails extends Component {
             }
             i++;
         }
-        array.push(str.substring(wordBeginning, str.length - 1));
+        array.push(str.substring(wordBeginning, str.length ));
         return array;
     }
 
@@ -121,12 +121,12 @@ class CourseDetails extends Component {
         // make react component for materialsNeeded
         let materials = [];
         for(let i = 0; i < materialsArray.length; i++){
-            materials.push( <li> {materialsArray[i]} </li>);
+            materials.push( <li key={i}> {materialsArray[i]} </li>);
         }
         
         let description = [];
         for(let i = 0; i < descriptionArray.length; i++){
-            description.push( <p> {descriptionArray[i]} </p>);
+            description.push( <p key={i}> {descriptionArray[i]} </p>);
         }
 
         return(

@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 
 const Header = (props) => {
 
+    const currentpath = props.location;
+
     return(
         <div className="header">
             <div className="bounds">
@@ -19,7 +21,7 @@ const Header = (props) => {
                                     :
                                     <nav>
                                         <Link className="signup" to="/signup">Sign Up</Link>
-                                        <Link className="signin" to="/signin">Sign In</Link>
+                                        <Link className="signin" to={{ pathname: "/signin", state: {from: currentpath}}} >Sign In</Link>
                                     </nav>
                                 }
                             </React.Fragment>

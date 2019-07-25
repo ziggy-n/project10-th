@@ -2,17 +2,17 @@ import React, { Component } from 'react';
 
 class ValidationError extends Component {
 
-    
-
     render(){
         console.log("in validation error component: ");
 
         if(this.props.valError){
             let errors = this.props.errorMsg;
             let errorListing = [];
-            if(typeof errors === 'string'){
+            
+            if(this.props.errorIsString){
                 console.log("validation error. string. :" + errors);
-                errorListing = <li>{errors}</li>;
+                console.log(errors);
+                errorListing.push(<li key={0}>{errors}</li>);
             } else { 
                 console.log("validation error. array. :" + errors);
                 for(let i = 0; i < errors.length; i++){

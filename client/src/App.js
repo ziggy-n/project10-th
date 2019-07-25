@@ -18,6 +18,8 @@ import UpdateCourse from './components/UpdateCourse';
 import UserSignOut from './components/UserSignOut';
 import NotFound from './components/NotFound';
 import PrivateRoute from './components/PrivateRoute';
+import Forbidden from './components/Forbidden';
+import UnHandledError from './components/UnhandledError';
 
 //import { withContext } from './components/Context';
 //const HeaderWithContext = withContext(Header);
@@ -40,17 +42,14 @@ class App extends React.Component {
       <Router>
         <div id="root">
             <Provider>
-              <Header />
+              <Route component={Header} />
 
               <Switch>
 
                 <Route exact path="/signup" component={UserSignUp} /> 
                 
-                <Route exact path="/signin" render={ (props) => 
-                  <UserSignIn
-                    {...props}
-                  /> } 
-                />
+                <Route exact path="/signin" component={UserSignIn} />
+
 
                 <Route exact path="/signout" render={ (props) => 
                   <UserSignOut
@@ -75,6 +74,24 @@ class App extends React.Component {
                   /> } 
                 />
     
+                <Route path="/forbidden" render={ (props) => 
+                  <Forbidden 
+                    {...props}
+                  /> } 
+                />  
+
+                <Route path="/error" render={ (props) => 
+                  <UnHandledError 
+                    {...props}
+                  /> } 
+                /> 
+
+                <Route path="/notfound" render={ (props) => 
+                  <NotFound 
+                    {...props}
+                  /> } 
+                /> 
+
                 <Route component={NotFound} />
 
               </Switch>

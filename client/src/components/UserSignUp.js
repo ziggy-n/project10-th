@@ -9,7 +9,8 @@ class UserSignUp extends Component {
         super(props);
         this.state = {
             valError: false,
-            errorMsg: null
+            errorMsg: null,
+            errorIsString: false
         }
     }
 
@@ -49,15 +50,17 @@ class UserSignUp extends Component {
 
         if(this.context.errorMessage){
             console.log("in signup handler before setting valError");
-            console.log(this.context.errorMessage)
+            console.log(this.context.errorMessage);
             this.setState({
                 valError: true,
-                errorMsg: this.context.errorMessage
+                errorMsg: this.context.errorMessage,
+                errorIsString: this.context.errorIsString
             })
         } else {
             this.setState({
                 valError: false,
-                errorMsg: null
+                errorMsg: null,
+                errorIsString: false
             })
             this.props.history.push('/');
         }
@@ -74,6 +77,7 @@ class UserSignUp extends Component {
                         <ValidationError 
                             valError={this.state.valError}
                             errorMsg={this.state.errorMsg}
+                            errorIsString={this.state.errorIsString}
                         />
                         <form onSubmit={this.handleSubmit}>
                             <div>
