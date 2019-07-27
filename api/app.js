@@ -63,6 +63,7 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   res.status(res.locals.errStatus || err.status || 500);
   err.message = res.locals.errMsg || err.message || "an has error occurred";
+  err.branch = res.locals.branch; // REMOVE WHEN DONE DEBUGGING
   res.json({
     error: {message: err.message}
   });

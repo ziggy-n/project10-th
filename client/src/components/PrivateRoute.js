@@ -29,4 +29,26 @@ export default ({ component: Component, ...rest }) => {
     );
   };
 
-
+  // export default ({ component: Component, ...rest }) => {
+  //   return (
+  //     <Consumer>
+  //       { context => (
+  //         <Route
+  //           {...rest}
+  //           render={props => context.currentAuthUserEmail ? 
+  //             (
+  //               <Component {...props} />
+  //             ) : 
+  //             (
+  //               <Redirect to={{
+  //                 pathname: '/forbidden',
+  //                 state: {from: props.location}
+  //               }
+  //               } />
+  //             )
+  //           }
+  //         />
+  //       )}
+  //     </Consumer>
+  //   );
+  // };

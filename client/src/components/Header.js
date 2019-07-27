@@ -1,7 +1,8 @@
 import React from 'react';
 import { MyContext } from './Context';
 import { Link } from 'react-router-dom';
-import { Consumer } from './Context';
+
+
 
 const Header = (props) => {
 

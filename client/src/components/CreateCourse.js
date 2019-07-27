@@ -57,58 +57,53 @@ class CreateCourse extends Component {
 
         // 
         let status = null;
-        await fetch('http://localhost:5000/api/courses', options)
+        let responseobj = await fetch('http://localhost:5000/api/courses', options)
             .then(response => {
                 console.log("first then");
                 
                 status = response.status;
 
                 if(response.status === 201){
-                    this.setState({
-                        valError: false,
-                        errorMsg: null,
-                        errorIsString: false
-                    });
                     console.log('successful course creation occurred');
                     
                     this.props.history.push('/');
-
+                    return null;
                 } else {
                     return response.json();
                 }
 
-            }).then(data => {
-                console.log("second then");
-                if(data.error.message){
-                    console.log("error occurred during course creation");
-                    if(typeof data.error.message === 'string'){
-                        this.setState({
-                            valError: true,
-                            errorMsg: data.error.message,
-                            errorIsString: true
-                        });
-                    } else {
-                        this.setState({
-                            valError: true,
-                            errorMsg: data.error.message,
-                            errorIsString: false
-                        });
-                    }
-                    
-                    
-                }
             }).catch(err => {
                 console.log("api request failed");
-                this.setState({
-                    valError: true,
-                    errorMsg: "api request failed",
-                    errorIsString: true
-                });
-            });
-        
-            if(status === 500) {
                 this.props.history.push('/error');
+            });
+            
+            
+        if(responseobj) {
+            console.log("second then");
+            if(responseobj.error.message){
+                console.log("error occurred during course creation");
+                if(typeof responseobj.error.message === 'string'){
+                    this.setState({
+                        valError: true,
+                        errorMsg: data.error.message,
+                        errorIsString: true
+                    });
+                } else {
+                    this.setState({
+                        valError: true,
+                        errorMsg: data.error.message,
+                        errorIsString: false
+                    });
+                }
+                
+                
             }
+        } 
+
+        
+        if(status === 500) {
+            this.props.history.push('/error');
+        }
     }
 
 

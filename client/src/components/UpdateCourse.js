@@ -27,7 +27,7 @@ class UpdateCourse extends Component {
           valError: false,
           errorMsg: null,
           errorIsString: false
-        }
+        };
     }
     
 
@@ -36,10 +36,6 @@ class UpdateCourse extends Component {
         let id = this.props.match.params.val;
         let course = null;
         let owner = null;
-        
-        this.setState({
-            courseId: id
-        })
 
         let status = null;
         await fetch(`http://localhost:5000/api/courses/${id}`
@@ -67,7 +63,13 @@ class UpdateCourse extends Component {
             return null;
         }
 
+        if(owner.id !== this.context.currentAuthUserId){
+            this.props.history.push('/forbidden');
+            return null;
+        }
+
         this.setState({
+            courseId: id,
             ownerFirstName: owner.firstName || "",
             ownerLastName: owner.lastname || "",
             ownerId: owner.id || null,
@@ -76,6 +78,8 @@ class UpdateCourse extends Component {
             courseEstimatedTime: course.estimatedTime || "",
             courseMaterialsNeeded: course.materialsNeeded || ""
         });
+
+        
     }
 
 
@@ -165,52 +169,50 @@ class UpdateCourse extends Component {
 
         let status = null;
         // 
-        await fetch(`http://localhost:5000/api/courses/${this.state.courseId}`, options)
+        let responseobj = await fetch(`http://localhost:5000/api/courses/${this.state.courseId}`, options)
         .then(response => {
             console.log("first then");
             status = response.status;
             if(response.status === 204){
-                this.setState({
-                    valError: false,
-                    errorMsg: null,
-                    errorIsString: false
-                });
+                // this.intermediary.valError = false;
+                // this.intermediary.errorMsg = null;
+                // this.intermediary.errorIsString = false;
                 console.log('successful course update occurred');
                 
                 this.props.history.push(`/courses/${this.state.courseId}`);
-
+                return null;
             } else {
                 return response.json();
             }
+        }).catch(err => {
+            console.log("api request failed");
+            this.props.history.push('/error');
+        });
 
-        }).then(data => {
+        if(responseobj){
             console.log("second then");
-            if(data.error.message){
+            console.dir(responseobj);
+            if(responseobj.error.message){
                 console.log("error occurred during course update");
-                if(typeof data.error.message === 'string'){
+                if(typeof responseobj.error.message === 'string'){
                     this.setState({
                         valError: true,
-                        errorMsg: data.error.message,
+                        errorMsg: responseobj.error.message,
                         errorIsString: true
                     });
                 } else {
                     this.setState({
                         valError: true,
-                        errorMsg: data.error.message,
+                        errorMsg: responseobj.error.message,
                         errorIsString: false
                     });
                 }
                 
                 
             }
-        }).catch(err => {
-            console.log("api request failed");
-            this.setState({
-                valError: true,
-                errorMsg: "api request failed",
-                errorIsString: true
-            });
-        });
+        }
+ 
+        console.log("status? " + status); 
 
         if(status === 500){
             this.props.history.push('/error');

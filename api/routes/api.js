@@ -195,6 +195,7 @@ router.post('/users', [firstNameValidation, lastNameValidation, emailAddressVali
     try{ 
         
         const errors = validationResult(req).errors;
+
         if(errors.length > 0){
             const errMsgs = errors.map(err => err.msg);
             res.locals.errStatus = 400;
@@ -264,9 +265,9 @@ router.post('/courses', [authenticate, titleValidation, descriptionValidation],
         console.log("in post course route");
         const errors = validationResult(req);
 
-        if(!errors.isEmpty){
+        if(!errors.isEmpty()){
             console.log("validation error occurred");
-            const errMsgs = errors.array().map(err => err.msg);
+            const errMsgs = errors.array().map(err => err.msg); // check this one
             res.locals.errStatus = 400;
             res.locals.errMsg = errMsgs;
             next(new Error());
@@ -333,14 +334,15 @@ router.get('/courses/:id', async (req, res, next) => {
 // can only be used by user that owns route
 router.put('/courses/:id', [authenticate, permission, titleValidation, descriptionValidation], async (req, res, next) => {
     
-    try {
+    try {  
         const errors = validationResult(req);
             
-        if(!errors.isEmpty){
+        if(!errors.isEmpty()){
             console.log("validation error occurred");
             const errMsgs = errors.array().map(err => err.msg);
             res.locals.errStatus = 400;
             res.locals.errMsg = errMsgs;
+            res.locals.branch = "validation error occurred";
             next(new Error());
         } else {
             const id = req.params.id;
@@ -365,6 +367,7 @@ router.put('/courses/:id', [authenticate, permission, titleValidation, descripti
         
         
     } catch(err){
+        res.locals.branch = "catch error";
         next(err);
     }
     
