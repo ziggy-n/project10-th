@@ -2,8 +2,10 @@ import React from 'react';
 import { MyContext } from './Context';
 import { Link } from 'react-router-dom';
 
-
-
+/***
+ * renders bar with 'signup' and 'signin' links if there is no authenticated user
+ * renders bar with 'signout' link and "Welcome FirstName LastName" if there is an authenticated user 
+ */
 const Header = (props) => {
 
     const currentpath = props.location;

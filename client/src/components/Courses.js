@@ -10,6 +10,10 @@ class Courses extends Component {
         }
     }
     
+    /***
+     * fetches all courses from REST API and stores them in array courseList
+     * if error occurred it redirects to error page
+     */
     async componentDidMount(){
         let status = null;
         let courses = null;
@@ -20,6 +24,7 @@ class Courses extends Component {
             }).then(function(data){
                 courses = data;
             }).catch(function(err){
+                this.props.history.push('/error');
                 console.log('error occurred fetching courses');
             });
         
@@ -32,6 +37,10 @@ class Courses extends Component {
     }
 
 
+    // renders a list of courses
+    // each course is represented by its title 
+    // each course is a link to the respective course details site
+    // also renders a link to the 'create course' site
     render(){
         let array = this.state.courseList;
         let rows = [];

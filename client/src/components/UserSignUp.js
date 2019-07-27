@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { MyContext }  from './Context';
 import ValidationError from './ValidationError';
 
+
 class UserSignUp extends Component {
 
     constructor(props){
@@ -22,19 +23,27 @@ class UserSignUp extends Component {
     passwordConfirmationInput = React.createRef();
 
     
+    // redirects to route route / when cancel is selected
     handleCancel = (event) => {
-        event.preventDefault();this.props.history.push('/');
+        event.preventDefault();
+        this.props.history.push('/');
 
     } 
 
+    /***
+     * checks if password and password confirmation match
+     * signs in user if input data is complete
+     * if data is incomplete it updates state to capture this
+     * if sign in is successful it will redirect to root route /
+     */
     handleSubmit = async (event) => {
         event.preventDefault();
 
         if(this.passwordInput.current.value !== this.passwordConfirmationInput.current.value){
-            console.log("passwords don't match");
             this.setState({
                 valError: true,
-                errorMsg: "passwords don't match"
+                errorMsg: "passwords don't match",
+                errorIsString: true
             });
             return;
         }
@@ -54,9 +63,6 @@ class UserSignUp extends Component {
 
 
         if(this.context.errorMessage){
-            console.log("in signup handler before setting valError");
-            console.log(this.context.errorMessage);
-
             this.setState({
                 valError: true,
                 errorMsg: this.context.errorMessage,
@@ -73,6 +79,15 @@ class UserSignUp extends Component {
     }
 
 
+    /***
+     * renders sign up form
+     * renders input field for first name, last name, email, password and password confirmation
+     * displays validation errors if incorrect data was submitted: 
+     *      displays message if any of the fields are not completed
+     *      displays message if password and password confirmation are not a match
+     * renders signup up button for form submission
+     * displays cancel button which is a link that redirects to the root route / 
+     */
     render(){
         return(
             <div className="bounds">

@@ -11,6 +11,11 @@ class CourseDetailsBar extends Component {
         this.props.requestDelete();
     }
 
+    /***
+     * does not render when there is a request to delete
+     * renders only "return to list" button if the owner of the course is not the currently authenticated user
+     * renders "return to list", "delete", "update" buttons if owner is the currently authenticated user
+     */
     render(){
         if(this.props.askDelete){
             return(

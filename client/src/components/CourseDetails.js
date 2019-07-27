@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { MyContext }  from './Context';
 import Delete from  './Delete';
 import CourseDetailsBar from './CourseDetailsBar';
-import { Redirect } from 'react-router-dom';
 
 
 class CourseDetails extends Component {
@@ -17,6 +16,13 @@ class CourseDetails extends Component {
         }
     }
     
+
+    /***
+     * fetches course data and data of the course's owner from REST API and stores them in state: ownerDetails, courseDetails
+     * if http response status is 500 it will redirect to errors page
+     * if course is not found it will redirect to notfound page
+     * checks if course owner is currently authenticated owner and stores this in state: notOwner
+     */
     async componentDidMount(){
 
         let id = this.props.match.params.val;
@@ -47,8 +53,8 @@ class CourseDetails extends Component {
             return null;
         }
         
-        if(status === 400 && errorMessage === 'No such course exists'){
-            this.props.location.push('/notfound');
+        if(!course || (status === 400 && errorMessage === 'No such course exists')){
+            this.props.history.push('/notfound');
             return null;
         }
 
@@ -80,6 +86,12 @@ class CourseDetails extends Component {
         })
     }
 
+    /***
+     * deletes course
+     * sends RESP API a delete request for the course
+     * if request was successful it redirects to root page
+     * if not it redirects to error page
+     */
     acceptDelete = async () => {
 
         // set options
@@ -94,27 +106,30 @@ class CourseDetails extends Component {
         options.headers['Authorization'] = `Basic ${encodedCredentials}`;
 
 
-        // check if email matches password
-
         const response = await fetch(`http://localhost:5000/api/courses/${this.state.courseDetails.id}`, options);
  
        
         if(response.status === 204){
             // is it necessary if you redirect after this anyways? 
-            this.setState({
-                askDelete: false
-            });
+            // this.setState({
+            //     askDelete: false
+            // });
             console.log("deleted course successfully");
             this.props.history.push('/');
         } else {
             if(response.status === 500) {
                 this.props.history.push('/error');
             }
-            console.log("error occurred when deleting course");
+            console.log("error occurred while deleting course");
         }
         
     }
 
+    /***
+     * helper function
+     * takes a multi line string and stores it in an array
+     * each array element stores one line
+     */
     structureText = (text) => {
         let str = String(text);
         let array = [];
@@ -135,10 +150,14 @@ class CourseDetails extends Component {
     }
 
 
-    // make react component for materialsNeeded
+    /***
+     * renders CourseDetails component: displays title, description, estimated time and materials needed for a course
+     * formats course description into paragraphs, formats materials needed as a bulletet list
+     * including CourseDetailsBar component
+     * including Delete (bar) component
+     * before rendering, it takes 'materials needed' and 'course description' and formats them into a more appropriate format
+     */
     render(){
-        console.log("inside course detail render");
-        
         let objOwner = this.state.ownerDetails;
         let objCourse = this.state.courseDetails;
 
@@ -159,21 +178,7 @@ class CourseDetails extends Component {
                 description.push( <p key={i}> {descriptionArray[i]} </p>);
             }
         } 
-        
-               
 
-        if(! this.state.courseDetails){
-            this.render(
-                <React.Fragment>
-                    <Redirect to={{
-                        pathname: '/forbidden',
-                        state: {from: this.props.location}
-                        }
-                    } />
-                </React.Fragment>
-            );
-            
-        } else {
             return(
                 <div>
                     <div className="actions--bar">
@@ -223,7 +228,7 @@ class CourseDetails extends Component {
                     
                 </div>
             );
-        }
+
         
     }
 }

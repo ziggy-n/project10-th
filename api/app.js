@@ -4,7 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors');
-//const models = require('./models'); // remove when remove test
 
 
 var indexRouter = require('./routes/index');
@@ -30,21 +29,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-// app.get('/test', async (req, res, next) => {
-//   try{
-//     let listusers = null;
-//     await models.User.findAll({ 
-//         attributes: ['id', 'firstName', 'lastName', 'emailAddress']
-//     }).then(function(list){
-//         listusers = list;
-//     });
-//     res.json(listusers);
-//   } catch(err){
-//     next(err);
-//   }
-// });
-
-
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -63,7 +47,6 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   res.status(res.locals.errStatus || err.status || 500);
   err.message = res.locals.errMsg || err.message || "an has error occurred";
-  err.branch = res.locals.branch; // REMOVE WHEN DONE DEBUGGING
   res.json({
     error: {message: err.message}
   });

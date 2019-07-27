@@ -170,22 +170,6 @@ router.get('/users', authenticate, async (req, res, next) => {
 
 });
 
-// REMOVE THIS. leave only for testing 
-router.get('/allusers', async (req, res, next) => {
-
-    try {
-        let listusers = null;
-        await models.User.findAll().then(function(list){
-            listusers = list;
-        });
-        res.json(listusers);
-
-
-    } catch(err){
-        next(err);
-    }
-
-});
 
 // creates a user, sets the Location header to "/" 
 // returns no content
@@ -209,9 +193,9 @@ router.post('/users', [firstNameValidation, lastNameValidation, emailAddressVali
                 await models.User.create(user).then(
                     result => newUser = result
                 );
-                res.location('/'); // remove? 
+                res.location('/'); 
 
-                // changed here, originally res.status(201).end()
+                // changed here for project 10, originally res.status(201).end()
                 res.status(201).json(newUser);
             } else {
                 res.locals.errStatus = 400;
@@ -267,7 +251,7 @@ router.post('/courses', [authenticate, titleValidation, descriptionValidation],
 
         if(!errors.isEmpty()){
             console.log("validation error occurred");
-            const errMsgs = errors.array().map(err => err.msg); // check this one
+            const errMsgs = errors.array().map(err => err.msg); 
             res.locals.errStatus = 400;
             res.locals.errMsg = errMsgs;
             next(new Error());
@@ -342,7 +326,6 @@ router.put('/courses/:id', [authenticate, permission, titleValidation, descripti
             const errMsgs = errors.array().map(err => err.msg);
             res.locals.errStatus = 400;
             res.locals.errMsg = errMsgs;
-            res.locals.branch = "validation error occurred";
             next(new Error());
         } else {
             const id = req.params.id;

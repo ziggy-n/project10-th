@@ -13,16 +13,12 @@ class UpdateCourse extends Component {
           ownerFirstName: null,
           ownerLastName: null,
           ownerId: null,
-
+          
+          courseId: null,  
           courseTitle: "",
           courseDescription: "",
           courseEstimatedTime: "",
           courseMaterialsNeeded: "",
-
-          hasTitle: true,
-          hasDescription: true,
-
-          courseId: null,
 
           valError: false,
           errorMsg: null,
@@ -31,6 +27,12 @@ class UpdateCourse extends Component {
     }
     
 
+    /***
+     * fetches course data and data about the coure's owner from REST API and stores the data in state
+     * if course not found it redirects to 'notfound' page
+     * if error occurs it redirects to 'errors' page
+     * if the currently authenticated user is not the owner of the course it redirect to the 'forbidden' page
+     */
     async componentDidMount(){
 
         let id = this.props.match.params.val;
@@ -45,13 +47,11 @@ class UpdateCourse extends Component {
             }).then(function(data){
                 owner = data.owner;
                 course = data.course;
-            }).catch(function(err){
+            }).catch(function(err){  
                 console.log('error occurred fetching course details');
+                this.props.history.push('/error');
             });
 
-        console.log("course here: ");
-        console.dir(course);
-        console.dir(owner);
         
         if(!course){
             this.props.history.push('/notfound');
@@ -82,7 +82,7 @@ class UpdateCourse extends Component {
         
     }
 
-
+    // sets state of course title according to the corresponding input field value
     handleChangeTitle = (event) => {
         event.preventDefault();
         this.setState({
@@ -90,6 +90,7 @@ class UpdateCourse extends Component {
         });
     }
 
+    // sets state of course description according to the corresponding input field value
     handleChangeDescription = (event) => {
         event.preventDefault();
         this.setState({
@@ -97,6 +98,7 @@ class UpdateCourse extends Component {
         });
     }
 
+    // sets state of course's estimated time according to the corresponding input field value
     handleChangeEstimatedTime = (event) => {
         event.preventDefault();
         this.setState({
@@ -104,6 +106,7 @@ class UpdateCourse extends Component {
         });
     }
 
+    // sets state of course's materials needed according to the corresponding input field value
     handleChangeMaterialsNeeded = (event) => {
         event.preventDefault();
         this.setState({
@@ -112,6 +115,12 @@ class UpdateCourse extends Component {
     }
 
 
+    /***
+     * takes course data stored in state and makes it the body of a http put request to the resp api
+     * a successful requests updates the course and redirects to the "course details" page
+     * if title or description are missing, it will denote this
+     * if an error occurred during the api request, it will redirect to the 'error' page
+     */
     handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -133,28 +142,6 @@ class UpdateCourse extends Component {
             data.description = this.state.courseDescription
         }
 
-        // let validationErrors = [];
-        // if(this.state.courseTitle === ""){
-        //     validationErrors.push("Course Title is required");
-        // } else {
-        //     data.title = this.state.courseTitle;
-        // }
-
-        // if(this.state.courseDescription === ""){
-        //     validationErrors.push("Course description is required")
-        // } else {
-        //     data.description = this.state.courseDescription
-        // }
-
-        // if(validationErrors.length > 0){
-        //     this.setState({
-        //         valError: true,
-        //         errorMsg: validationErrors,
-        //         errorIsString: false
-        //     });
-        //     return null;
-        // }
-
         // set options
         const options = {
             method: 'PUT',
@@ -168,17 +155,11 @@ class UpdateCourse extends Component {
 
 
         let status = null;
-        // 
         let responseobj = await fetch(`http://localhost:5000/api/courses/${this.state.courseId}`, options)
         .then(response => {
-            console.log("first then");
             status = response.status;
             if(response.status === 204){
-                // this.intermediary.valError = false;
-                // this.intermediary.errorMsg = null;
-                // this.intermediary.errorIsString = false;
-                console.log('successful course update occurred');
-                
+                console.log('successful course update occurred');              
                 this.props.history.push(`/courses/${this.state.courseId}`);
                 return null;
             } else {
@@ -190,10 +171,7 @@ class UpdateCourse extends Component {
         });
 
         if(responseobj){
-            console.log("second then");
-            console.dir(responseobj);
             if(responseobj.error.message){
-                console.log("error occurred during course update");
                 if(typeof responseobj.error.message === 'string'){
                     this.setState({
                         valError: true,
@@ -211,8 +189,6 @@ class UpdateCourse extends Component {
                 
             }
         }
- 
-        console.log("status? " + status); 
 
         if(status === 500){
             this.props.history.push('/error');
@@ -221,10 +197,17 @@ class UpdateCourse extends Component {
     }
 
 
-
+    /***
+     * renders update course form
+     * it renders input fields for course title and estimated time
+     * it renders a textarea for the course description and materials needed
+     * it renders with the current course data as values to the input field and textarea
+     * if there is no estimated time in the current course data, the placeholder "Hours" appears
+     * if there is no listed materials in the current course data, the placeholder "List materials ..." appears
+     * it renders a submit button
+     * it renders a cancel button which redirects to the 'course detail' page
+     */
     render() {
-        console.log("inside update course render");
-
             return(
                 <div className="bounds course--detail">
                     <h1>Update Course</h1>

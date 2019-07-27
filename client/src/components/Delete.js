@@ -12,6 +12,9 @@ class Delete extends Component {
         this.props.acceptDelete();
     }
 
+    // Delete component is only rendered if course owner asked for the course to be deleted
+    // renders "yes" button which deletes the course
+    // renders "no" button which redirects back to the root route /
     render(){
         if(this.props.askDelete){
             return(

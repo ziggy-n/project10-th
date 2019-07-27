@@ -25,6 +25,13 @@ class CreateCourse extends Component {
         this.props.history.push('/');
     }
 
+
+    /***
+     * sends a post request to the REST API with the course details as a body and authorization credentials 
+     * if post request is successful it will redirect user to root route /
+     * if title or description are missing it will notify user
+     * if api request failed it will redirect to error page
+     */
     handleSubmit = async (event) => {
         
         event.preventDefault();
@@ -55,17 +62,12 @@ class CreateCourse extends Component {
         options.headers['Authorization'] = `Basic ${encodedCredentials}`;
 
 
-        // 
         let status = null;
         let responseobj = await fetch('http://localhost:5000/api/courses', options)
             .then(response => {
-                console.log("first then");
-                
                 status = response.status;
-
                 if(response.status === 201){
                     console.log('successful course creation occurred');
-                    
                     this.props.history.push('/');
                     return null;
                 } else {
@@ -79,19 +81,18 @@ class CreateCourse extends Component {
             
             
         if(responseobj) {
-            console.log("second then");
             if(responseobj.error.message){
                 console.log("error occurred during course creation");
                 if(typeof responseobj.error.message === 'string'){
                     this.setState({
                         valError: true,
-                        errorMsg: data.error.message,
+                        errorMsg: responseobj.error.message,
                         errorIsString: true
                     });
                 } else {
                     this.setState({
                         valError: true,
-                        errorMsg: data.error.message,
+                        errorMsg: responseobj.error.message,
                         errorIsString: false
                     });
                 }
@@ -107,6 +108,13 @@ class CreateCourse extends Component {
     }
 
 
+    /***
+     * renders form for course creation
+     * displays input fields for course title, and estimated time
+     * displays textareas for course description and materials needed
+     * renders button for form submission named 'update' 
+     * renders button to cancel course creation that will redirect user to route route /
+     */
     render(){
 
         return(

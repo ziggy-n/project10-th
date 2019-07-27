@@ -14,20 +14,19 @@ class UserSignIn extends Component {
         }
     }
 
-
     emailAddressInput = React.createRef();
     passwordInput = React.createRef();
 
-    handleCancel = (event) => {
-        event.preventDefault();
 
-    } 
-
+    /***
+     * remembers last page visited before signin page
+     * after successful signin one is redirected to that page
+     * 
+     * displays "Access Denied" if user is not a signed up user and password and email arent a match
+     * redirects to error page if an error occurred on the server side
+     */
     handleSubmit = async (event) => {
         event.preventDefault();
-
-        console.log("inside handlesubmit usersignin");
-        console.log(this.props.location);
 
         const { from } = this.props.location.state || { from: { pathname: '/'}};
 
@@ -63,6 +62,14 @@ class UserSignIn extends Component {
         
     }
 
+
+    /***
+     * renders input field for email address
+     * renders input field for password
+     * renders cancel button which redirects to root page /
+     * renders form submission button
+     * displays encouragement to go to 'signup' page if one has no account
+     */
     render(){
 
         return(

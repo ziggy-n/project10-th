@@ -21,8 +21,6 @@ import PrivateRoute from './components/PrivateRoute';
 import Forbidden from './components/Forbidden';
 import UnHandledError from './components/UnhandledError';
 
-//import { withContext } from './components/Context';
-//const HeaderWithContext = withContext(Header);
 
 
 class App extends React.Component {
@@ -106,7 +104,3 @@ export default App;
 
 
 
-/*** 
- * 
- * 
-***/

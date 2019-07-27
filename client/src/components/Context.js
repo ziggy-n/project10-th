@@ -17,9 +17,6 @@ class Provider extends Component {
             errorIsString: Cookies.getJSON('errorIsString') || null,
             status: Cookies.getJSON('status') || null,
         }
-        // this.signIn = this.signIn.bind(this);
-        // this.signOut = this.signOut.bind(this);
-        // this.signUp = this.signUp.bind(this);
     }
 
     render(){
@@ -50,8 +47,6 @@ class Provider extends Component {
     // creates new user entry in database
     // if sign up is successful, sets new user as authenticated user
     signUp = async (userData)  => {
-        console.log("signup function");
-
         const bodyOfData = {};
 
         if(userData.firstName){
@@ -134,9 +129,8 @@ class Provider extends Component {
     }
 
 
+    // sets user to authenticated user
     signIn = async (userData)  => {
-        console.log("signin function");
-
         // set options
         const options = {
             method: 'GET',
@@ -208,8 +202,8 @@ class Provider extends Component {
  
     }
 
+    // removes authenticated users data from state
     signOut = async () => {
-        console.log("signout function");
         this.setState({
             currentAuthUserEmail: null,
             currentAuthUserFirstName: null,
@@ -222,6 +216,7 @@ class Provider extends Component {
         Cookies.remove('currentAuthUserLastName');
         Cookies.remove('currentAuthUserPassword');
         Cookies.remove('currentAuthUserId');
+
         console.log("successful sign out occurred");
         return null;
     }
